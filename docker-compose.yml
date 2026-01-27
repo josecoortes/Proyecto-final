@@ -1,0 +1,22 @@
+services:
+  workspace:
+    build: .
+    container_name: entorno_trabajo
+    volumes:
+      - .:/var/www/html  # Lo que hagas dentro, aparecerá en tu Windows
+    ports:
+      - "8000:8000"      # Puerto para Laravel
+      - "4200:4200"      # Puerto para Angular
+    command: tail -f /dev/null  # Mantiene el contenedor encendido para que entres
+    depends_on:
+      - db
+
+  # La base de datos (requisito de Laravel)
+  db:
+    image: mysql:8.0
+    container_name: base_datos
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: proyecto_db
+    ports:
+      - "3306:3306"
