@@ -1,62 +1,79 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core'; // <--- Importamos esto
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule], // NECESARIO para que funcione *ngIf
+  imports: [CommonModule],
   template: `
-    <div style="text-align:center; padding: 50px; font-family: sans-serif;">
-      <h1>Proyecto Integrado DAW</h1>
+    <div style="font-family: sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px;">
       
-      <div *ngIf="mensaje" style="background-color: #d4edda; color: #155724; padding: 20px; margin: 20px auto; border: 1px solid green; max-width: 500px;">
-        <h3>¡ÉXITO!</h3>
-        <p>{{ mensaje }}</p>
+      <header style="text-align: center; margin-bottom: 40px;">
+        <h1 style="color: #d35400; font-size: 3em;">🍔 FoodDelivery</h1>
+        <p style="color: #7f8c8d; font-size: 1.2em;">Tus platos favoritos a un clic</p>
+      </header>
+
+      <div *ngIf="cargando" style="text-align:center; font-size: 20px; color: #666;">
+        ⏳ Cargando carta...
       </div>
 
-      <div *ngIf="error" style="background-color: #f8d7da; color: #721c24; padding: 20px; margin: 20px auto; border: 1px solid red; max-width: 500px;">
-        <h3>ERROR</h3>
-        <p>{{ error }}</p>
+      <div *ngIf="error" style="background-color: #ffdddd; color: red; padding: 15px; text-align: center;">
+        {{ error }}
       </div>
 
-      <button (click)="conectarConLaravel()" style="font-size: 18px; padding: 10px 20px; cursor: pointer;">
-        Probar conexión
-      </button>
-      
-      <p style="margin-top: 20px; color: grey;">(Mira la consola F12 si no cambia nada)</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+        
+        <div *ngFor="let plato of platos" style="border: 1px solid #eee; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+          
+          <img [src]="plato.imagen" [alt]="plato.nombre" style="width: 100%; hieght: 200px; object-fit: cover;">
+          
+          <div style="padding: 20px;">
+            <h2 style="margin: 0 0 10px 0; color: #2c3e50;">{{ plato.nombre }}</h2>
+            <p style="color: #7f8c8d; height: 60px;">{{ plato.descripcion }}</p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+              <span style="font-size: 1.5em; font-weight: bold; color: #27ae60;">{{ plato.precio }} €</span>
+              <button style="background-color: #d35400; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                Añadir
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   `,
   styles: []
 })
-export class App {
+export class App implements OnInit {
   private http = inject(HttpClient);
-  private cd = inject(ChangeDetectorRef); // <--- La herramienta para forzar el repintado
+  private cd = inject(ChangeDetectorRef);
 
-  mensaje: string = '';
-  error: string = '';
+  platos: any[] = []; // Aquí guardaremos los datos del JSON
+  cargando = true;
+  error = '';
 
-  conectarConLaravel() {
-    console.log('Iniciando petición...');
-    this.mensaje = '';
-    this.error = '';
+  // ngOnInit se ejecuta solo al arrancar la página
+  ngOnInit() {
+    this.cargarPlatos();
+  }
 
-    this.http.get<any>('http://127.0.0.1:8000/api/saludo')
+  cargarPlatos() {
+    // Llamamos a la API de Laravel
+    this.http.get<any[]>('http://127.0.0.1:8000/api/platos')
       .subscribe({
         next: (data) => {
-          console.log('Datos recibidos:', data);
-          
-          // 1. Asignamos el valor
-          this.mensaje = data.mensaje;
-          
-          // 2. OBLIGAMOS a Angular a actualizar la pantalla
-          this.cd.detectChanges(); 
+          console.log('Platos recibidos:', data);
+          this.platos = data; // Guardamos el JSON en la variable
+          this.cargando = false;
+          this.cd.detectChanges(); // Forzamos actualización de pantalla
         },
         error: (e) => {
-          console.error('Error:', e);
-          this.error = 'Falló la conexión. Revisa la consola.';
-          
-          // 2. OBLIGAMOS a Angular a actualizar la pantalla
+          console.error(e);
+          this.error = 'Error al cargar los platos. Comprueba que el backend funciona.';
+          this.cargando = false;
           this.cd.detectChanges();
         }
       });

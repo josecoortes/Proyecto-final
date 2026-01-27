@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PlatoController;
 
 Route::get('/saludo', function () {
     return response()->json([
@@ -7,3 +8,4 @@ Route::get('/saludo', function () {
         'status' => 'success'
     ]);
 });
+Route::get('/platos', [PlatoController::class, 'index']);
