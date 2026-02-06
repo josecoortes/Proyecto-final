@@ -5,9 +5,9 @@ services:
     volumes:
       - .:/var/www/html  # Lo que hagas dentro, aparecerá en tu Windows
     ports:
-      - "8000:8000"      # Puerto para Laravel
+      - "8001:8000"      # Puerto para Laravel
       - "4200:4200"      # Puerto para Angular
-    command: tail -f /dev/null  # Mantiene el contenedor encendido para que entres
+    command: bash -c "sed -i 's/\r$//' /var/www/html/docker-entrypoint.sh && bash /var/www/html/docker-entrypoint.sh"
     depends_on:
       - db
 

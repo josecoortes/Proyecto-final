@@ -62,7 +62,7 @@ export class App implements OnInit {
 
   cargarPlatos() {
     // Llamamos a la API de Laravel
-    this.http.get<any[]>('http://127.0.0.1:8000/api/platos')
+    this.http.get<any[]>('http://127.0.0.1:8001/api/platos')
       .subscribe({
         next: (data) => {
           console.log('Platos recibidos:', data);
