@@ -9,13 +9,17 @@ class Plato extends Model
 {
     use HasFactory;
 
-    // Esto permite guardar cualquier dato sin restricciones (útil para desarrollo)
-    protected $guarded = [];
+    protected $guarded = []; // Permite guardar todo sin restricciones
 
     // --- RELACIONES ---
 
+    // Un plato pertenece a UNA categoría (Esto es NUEVO)
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
     // Un plato puede estar en muchos pedidos
-    // Usamos 'withPivot' para saber la cantidad pedida de este plato
     public function pedidos()
     {
         return $this->belongsToMany(Pedido::class)->withPivot('cantidad');

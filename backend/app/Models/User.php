@@ -6,24 +6,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens; // <--- 1. IMPORTANTE: AÑADIR ESTA LÍNEA
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasApiTokens, HasFactory, Notifiable; // <--- 2. IMPORTANTE: AÑADIRLO AQUÍ TAMBIÉN
 
     /**
-     * Los atributos que se pueden asignar masivamente.
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'telefono', // Añadido
-        'rol',      // Añadido
+        'rol', // <--- Aprovecha y añade 'rol' si no lo tenías, para que no falle luego
     ];
 
     /**
-     * Los atributos que deben ocultarse para la serialización.
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -31,7 +36,9 @@ class User extends Authenticatable
     ];
 
     /**
-     * Los atributos que deben castearse.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -39,19 +46,5 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    // --- RELACIONES ---
-
-    // Un usuario tiene muchos pedidos
-    public function pedidos()
-    {
-        return $this->hasMany(Pedido::class);
-    }
-
-    // Un usuario tiene muchos comentarios
-    public function comentarios()
-    {
-        return $this->hasMany(Comentario::class);
     }
 }
