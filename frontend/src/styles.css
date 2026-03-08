@@ -1,1 +1,84 @@
-/* You can add global styles to this file, and also import other style files */
+/* Archivo de estilos globales - Burguer Marina */
+
+:root {
+  /* Paleta de Colores (Inspirada en Fast Food / McDonald's) */
+  --color-primary: #E3000F; /* Rojo Marina */
+  --color-primary-dark: #C2000C; 
+  --color-accent: #FFC72C; /* Amarillo Mostaza */
+  --color-accent-dark: #E5B327;
+  --color-text-main: #27251F; /* Texto principal oscuro */
+  --color-text-muted: #666666; /* Texto secundario gris */
+  --color-bg-light: #F4F4F9; /* Fondo claro para resaltar los platos */
+  --color-white: #FFFFFF;
+  
+  /* Fuentes */
+  --font-title: 'Oswald', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-main);
+  background-color: var(--color-bg-light);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Clases utilitarias globales */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-title);
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px; /* Bordes ligeramente redondeados modernos */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-transform: uppercase;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(227, 0, 15, 0.3);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-text-main);
+  font-family: var(--font-title);
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-transform: uppercase;
+}
+
+.btn-accent:hover {
+  background-color: var(--color-accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 199, 44, 0.4);
+}

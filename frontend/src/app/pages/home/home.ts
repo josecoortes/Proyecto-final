@@ -6,40 +6,56 @@ import { HttpClient } from '@angular/common/http';
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule],
+  styleUrls: ['./home.css'],
   template: `
-      <div *ngIf="cargando" style="text-align:center; font-size: 20px; color: #666; margin-top: 50px;">
-        ⏳ Cargando nuestra carta...
-      </div>
+      <!-- HERO BANNER -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <h1>Sabor que te hace sonreír</h1>
+          <p>Disfruta de las mejores hamburguesas de la ciudad, elaboradas con ingredientes frescos todos los días. 100% Vacuno Marina.</p>
+          <button class="btn-accent hero-btn" (click)="scrollToMenu()">Ver Menú Completo</button>
+        </div>
+      </section>
 
-      <div *ngIf="error" style="background-color: #ffdddd; color: red; padding: 15px; text-align: center; margin: 20px; border-radius: 8px;">
-        {{ error }}
-      </div>
+      <!-- SECCIÓN DE PRODUCTOS -->
+      <section id="menu-section" class="menu-section">
+        <div class="menu-header">
+          <h2>Nuestros Clásicos</h2>
+          <p>Calidad en cada bocado.</p>
+        </div>
 
-      <div *ngIf="!cargando && platos.length > 0"
-           style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 20px;">
+        <div *ngIf="cargando" class="loading-state">
+          <div class="spinner"></div>
+          <p>Preparando la parrilla...</p>
+        </div>
 
-        <div *ngFor="let plato of platos" style="border: 1px solid #eee; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); background: white;">
-          <img [src]="plato.imagen || 'https://via.placeholder.com/400x250?text=Marina+BBQ'"
-               [alt]="plato.nombre"
-               style="width: 100%; height: 200px; object-fit: cover;">
+        <div *ngIf="error" class="error-msg">
+          {{ error }}
+        </div>
 
-          <div style="padding: 20px;">
-            <h2 style="margin: 0 0 10px 0; color: #2c3e50;">{{ plato.nombre }}</h2>
-            <p style="color: #7f8c8d; height: 60px; overflow: hidden;">{{ plato.descripcion }}</p>
+        <div *ngIf="!cargando && platos.length > 0" class="products-grid">
+          <div *ngFor="let plato of platos" class="product-card">
+            <div class="product-img-wrapper">
+              <img [src]="plato.imagen || 'https://via.placeholder.com/400x250/FFC72C/27251F?text=Burguer+Marina'"
+                   [alt]="plato.nombre" class="product-img">
+              <div class="product-price-badge">{{ plato.precio }} €</div>
+            </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-              <span style="font-size: 1.5em; font-weight: bold; color: #27ae60;">{{ plato.precio }} €</span>
-              <button style="background-color: #d35400; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                Añadir
-              </button>
+            <div class="product-info">
+              <h3>{{ plato.nombre }}</h3>
+              <p class="product-desc">{{ plato.descripcion }}</p>
+
+              <div class="product-actions">
+                <button class="btn-primary w-100">Añadir al Pedido</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div *ngIf="!cargando && platos.length === 0 && !error" style="text-align:center; color: #999; margin-top: 50px;">
-        No hay platos disponibles en este momento.
-      </div>
+        <div *ngIf="!cargando && platos.length === 0 && !error" class="empty-state">
+          No hay platos disponibles en este momento. Volvemos enseguida.
+        </div>
+      </section>
   `
 })
 export class HomeComponent implements OnInit {
@@ -49,6 +65,13 @@ export class HomeComponent implements OnInit {
   platos: any[] = [];
   cargando = true;
   error = '';
+
+  scrollToMenu() {
+    const element = document.getElementById('menu-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 
   ngOnInit() {
     this.http.get<any>('http://127.0.0.1:8000/api/platos')

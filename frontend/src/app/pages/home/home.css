@@ -1,0 +1,172 @@
+/* HERO SECTION */
+.hero-section {
+  background-color: var(--color-primary);
+  background-image: radial-gradient(circle at center, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  color: var(--color-white);
+  padding: 80px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-section h1 {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: 1px;
+}
+
+.hero-section p {
+  font-size: 1.25rem;
+  margin-bottom: 35px;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+.hero-btn {
+  font-size: 1.2rem;
+  padding: 15px 35px;
+  border-radius: 50px; /* Botón bien redondo (pill) */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* MENU SECTION */
+.menu-section {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.menu-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.menu-header h2 {
+  font-size: 2.5rem;
+  color: var(--color-text-main);
+  margin-bottom: 10px;
+}
+
+.menu-header p {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+/* GRID DE PRODUCTOS */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* TARJETA DE PRODUCTO */
+.product-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+}
+
+.product-img-wrapper {
+  position: relative;
+  height: 240px;
+  background-color: #f8f8f8;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Mostrar completamente (como fotos de McDonalds suele ser png con fondo transparente) */
+  padding: 15px;
+}
+
+.product-price-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: var(--color-accent);
+  color: var(--color-text-main);
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 5px 15px;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.product-info {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-info h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: var(--color-text-main);
+}
+
+.product-desc {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 25px;
+  flex-grow: 1;
+}
+
+.product-actions {
+  margin-top: auto;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+/* ESTADOS DE CARGA Y ERROR */
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(227, 0, 15, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  margin: 0 auto 20px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-msg {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+}
