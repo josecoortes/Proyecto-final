@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -53,6 +53,7 @@ export class LoginComponent {
   // para que él se encargue de hablar con Laravel. El componente solo pinta la vista.
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   credenciales = { email: '', password: '' };
   error = '';
@@ -67,8 +68,12 @@ export class LoginComponent {
       next: (respuesta) => {
         // Tuvimos éxito. El auth.service.ts ya se ha encargado de guardar el token en el LocalStorage
         this.cargando = false;
+        this.cdr.detectChanges();
         alert('¡Bienvenido de nuevo, ' + respuesta.user.name + '!');
-        this.router.navigate(['/']); // Redirigir al Inicio
+        
+        // Usamos location.href en lugar de router.navigate para forzar una recarga
+        // limpia de toda la aplicación Angular y asegurar que el Navbar pille el token.
+        window.location.href = '/'; 
       },
       error: (err) => {
         this.cargando = false;
@@ -79,6 +84,7 @@ export class LoginComponent {
         } else {
           this.error = 'No pudimos conectar con los servidores de Marina. Intenta más tarde.';
         }
+        this.cdr.detectChanges(); // Forzar actualización visual del botón y del mensaje de error
       }
     });
   }

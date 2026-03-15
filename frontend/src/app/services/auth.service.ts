@@ -12,14 +12,31 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = 'http://127.0.0.1:8000/api';
 
-  // Usamos BehaviorSubject (una especie de variable en tiempo real) para que la barra 
-  // superior (Navbar) sepa al instante cuando el usuario inicia o cierra sesión sin tener que recargar la página.
-  private loggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
+  // Inicializamos el estado siempre en FALSE para que el servidor (SSR) y 
+  // la primera carga del cliente generen exactamente el mismo HTML (y no se rompa la Hidratación de Angular).
+  private loggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.loggedInSubject.asObservable(); // Observable público
 
+  constructor() {
+    // Una vez construido, si estamos en el navegador, comprobamos si tenemos token
+    // y actualizamos el estado silenciosamente (usamos setTimeout para que ocurra DESPUÉS de hidratar el HTML inicial)
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        if (this.hasToken()) {
+          this.loggedInSubject.next(true);
+        }
+      }, 0);
+    }
+  }
+
   // Comprueba si ya hay un token guardado (al refrescar la página)
+  // Ojo: Angular intenta renderizar la página en el servidor (SSR) antes de mandarla al navegador.
+  // En el servidor, "localStorage" no existe, por eso tenemos que comprobar si typeof window !== 'undefined'.
   private hasToken(): boolean {
-    return !!localStorage.getItem('token_auth');
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      return !!localStorage.getItem('token_auth');
+    }
+    return false;
   }
 
   // Realizar la petición de Login
@@ -27,9 +44,27 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, credenciales).pipe(
       tap(respuesta => {
         // Al recibir la respuesta, guardamos los datos
-        localStorage.setItem('token_auth', respuesta.access_token);
-        localStorage.setItem('usuario_nombre', respuesta.user.name);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token_auth', respuesta.access_token);
+          localStorage.setItem('usuario_nombre', respuesta.user.name);
+        }
         // Notificamos que el estado ha cambiado a "Conectado"
+        this.loggedInSubject.next(true);
+      })
+    );
+  }
+
+  // Realizar la petición de Registro (¡NUEVO!)
+  // Igual que en el login, le pasamos los datos y si Laravel dice OK, guardamos el token
+  // para que no tenga que iniciar sesión a mano justo después de registrarse. 
+  // (¡Es un auto-login!)
+  registro(datos: { name: string; email: string; password: string }) {
+    return this.http.post<any>(`${this.apiUrl}/register`, datos).pipe(
+      tap(respuesta => {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token_auth', respuesta.access_token);
+          localStorage.setItem('usuario_nombre', respuesta.user.name);
+        }
         this.loggedInSubject.next(true);
       })
     );
@@ -37,13 +72,18 @@ export class AuthService {
 
   // Para cerrar sesión limpiamos los datos
   logout() {
-    localStorage.removeItem('token_auth');
-    localStorage.removeItem('usuario_nombre');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token_auth');
+      localStorage.removeItem('usuario_nombre');
+    }
     this.loggedInSubject.next(false);
   }
 
   // Obtener nombre del usuario actual
   getUsername(): string | null {
-    return localStorage.getItem('usuario_nombre');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('usuario_nombre');
+    }
+    return null;
   }
 }

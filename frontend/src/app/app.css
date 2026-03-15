@@ -54,6 +54,33 @@
   font-size: 0.95rem;
 }
 
+.user-greeting {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-text-main);
+  background-color: var(--color-bg-light);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  color: #D32F2F;
+  border: 1.5px solid #D32F2F;
+  border-radius: 8px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline-danger:hover {
+  background-color: #D32F2F;
+  color: white;
+}
+
 /* Contenido Principal */
 .main-content {
   min-height: calc(100vh - 160px); /* Restando header y footer aprox */
