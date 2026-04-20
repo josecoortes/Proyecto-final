@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-home',
@@ -46,7 +47,7 @@ import { HttpClient } from '@angular/common/http';
               <p class="product-desc">{{ plato.descripcion }}</p>
 
               <div class="product-actions">
-                <button class="btn-primary w-100">Añadir al Pedido</button>
+                <button class="btn-primary w-100" (click)="cartService.addToCart(plato)">Añadir al Pedido</button>
               </div>
             </div>
           </div>
@@ -61,6 +62,7 @@ import { HttpClient } from '@angular/common/http';
 export class HomeComponent implements OnInit {
   private http = inject(HttpClient);
   private cd = inject(ChangeDetectorRef);
+  public cartService = inject(CartService);
 
   platos: any[] = [];
   cargando = true;
@@ -77,7 +79,8 @@ export class HomeComponent implements OnInit {
     this.http.get<any>('http://127.0.0.1:8000/api/platos')
       .subscribe({
         next: (res) => {
-          // CLAVE: Extraemos el array 'data' de la respuesta paginada
+          // Ojo aquí: Laravel hace una paginación que te mete los platos dentro 
+          // de un array 'data' (res.data). Si dejamos res a secas como antes, revienta el ngFor de Angular.
           if (res && res.data && Array.isArray(res.data)) {
             this.platos = res.data;
           } else if (Array.isArray(res)) {
