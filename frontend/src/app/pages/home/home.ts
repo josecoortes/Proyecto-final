@@ -2,6 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from '../../services/cart.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -76,7 +77,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.http.get<any>('http://127.0.0.1:8000/api/platos')
+    this.http.get<any>(`${environment.apiUrl}/platos`)
       .subscribe({
         next: (res) => {
           // Ojo aquí: Laravel hace una paginación que te mete los platos dentro 
