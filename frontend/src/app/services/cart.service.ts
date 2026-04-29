@@ -43,7 +43,9 @@ export class CartService {
     // Esto lo busqué y así nos evitamos que si el usuario recarga la página, 
     // se le vacíe el carrito entero y perdamos ventas (imagínate el cabreo).
     effect(() => {
-      localStorage.setItem('marina_burguer_cart', JSON.stringify(this.cart()));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('marina_burguer_cart', JSON.stringify(this.cart()));
+      }
     });
   }
 
@@ -104,9 +106,11 @@ export class CartService {
 
   private cargarDeLocalStorage() {
     try {
-      const guardado = localStorage.getItem('marina_burguer_cart');
-      if (guardado) {
-        this.cart.set(JSON.parse(guardado));
+      if (typeof window !== 'undefined') {
+        const guardado = localStorage.getItem('marina_burguer_cart');
+        if (guardado) {
+          this.cart.set(JSON.parse(guardado));
+        }
       }
     } catch (e) {
       console.error('Error cargando carrito local', e);
