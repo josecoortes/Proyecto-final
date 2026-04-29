@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class AuthService {
   // para no mezclar el código visual (HTML/CSS) con las peticiones a Laravel.
   // Así el código queda mucho más limpio y podemos reutilizar este servicio en el Registro.
   private http = inject(HttpClient);
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = environment.apiUrl;
 
   // Inicializamos el estado siempre en FALSE para que el servidor (SSR) y 
   // la primera carga del cliente generen exactamente el mismo HTML (y no se rompa la Hidratación de Angular).
