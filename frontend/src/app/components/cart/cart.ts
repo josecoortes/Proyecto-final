@@ -11,14 +11,24 @@ import { CartService } from '../../services/cart.service';
     <!-- Overlay del background (cierra el carrito si haces clic) -->
     <div class="cart-overlay" 
          [class.open]="cartService.isCartOpen()" 
-         (click)="cartService.closeCart()">
+         (click)="!cartService.isProcessing() && cartService.closeCart()">
     </div>
 
     <!-- Panel lateral del Carrito -->
     <div class="cart-panel" [class.open]="cartService.isCartOpen()">
       <div class="cart-header">
         <h2>Tu Pedido</h2>
-        <button class="close-btn" (click)="cartService.closeCart()">×</button>
+        <button class="close-btn" 
+                (click)="!cartService.isProcessing() && cartService.closeCart()" 
+                [disabled]="cartService.isProcessing()">×</button>
+      </div>
+
+      <!-- NOTIFICACIONES (Sustituto de alert()) -->
+      <div *ngIf="cartService.notification() as notif" 
+           class="cart-notification" 
+           [class.success]="notif.type === 'success'" 
+           [class.error]="notif.type === 'error'">
+        {{ notif.message }}
       </div>
 
       <div class="cart-body">
@@ -35,7 +45,10 @@ import { CartService } from '../../services/cart.service';
             
             <div class="cart-item-details">
               <h4>{{ item.plato.nombre }}</h4>
-              <p class="cart-item-price">{{ item.plato.precio }} €</p>
+              <p class="cart-item-price">
+                 {{ item.plato.precio }} €/u 
+                 <span class="subtotal-item">→ Subtotal: {{ item.plato.precio * item.cantidad | number:'1.2-2' }} €</span>
+              </p>
               
               <div class="quantity-controls">
                 <button (click)="cartService.updateQuantity(item.plato.id, item.cantidad - 1)">-</button>
@@ -53,15 +66,62 @@ import { CartService } from '../../services/cart.service';
 
       <!-- Footer del Carrito -->
       <div class="cart-footer" *ngIf="cartService.cart().length > 0">
-        <div class="cart-total">
+        
+        <div class="delivery-options">
+          <label for="metodoEntrega">Método de entrega:</label>
+          <select id="metodoEntrega" class="delivery-select" (change)="cambiarMetodo($event)">
+            <option value="recoger">Recoger en local</option>
+            <option value="domicilio">A domicilio</option>
+          </select>
+          
+          <input *ngIf="metodo === 'domicilio'" 
+                 type="text" 
+                 placeholder="Ej. Calle Falsa 123, 4ºB" 
+                 class="delivery-input mt-2"
+                 (input)="cambiarDireccion($event)">
+        </div>
+
+        <div class="delivery-options mt-3">
+          <label for="metodoPago">Método de Pago:</label>
+          <select id="metodoPago" class="delivery-select" (change)="cambiarPago($event)">
+            <option value="efectivo">Efectivo al recibir</option>
+            <option value="tarjeta">💳 Tarjeta Bancaria (Seguro)</option>
+          </select>
+        </div>
+
+        <div class="cart-total mt-4">
           <span>Total a pagar:</span>
           <span class="total-price">{{ cartService.totalPrice() | number:'1.2-2' }} €</span>
         </div>
-        <button class="btn-primary w-100 checkout-btn">Procesar Pedido</button>
+        <button class="btn-primary w-100 checkout-btn" 
+                [disabled]="cartService.isProcessing()"
+                (click)="cartService.procesarPedido(metodo, direccion, metodoPago)">
+          <span *ngIf="cartService.isProcessing() && cartService.isSimulatingPayment()">
+             <svg class="spinner inline-block w-4 h-4 mr-2 text-white animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+             Conectando con el banco...
+          </span>
+          <span *ngIf="cartService.isProcessing() && !cartService.isSimulatingPayment()">Procesando...</span>
+          <span *ngIf="!cartService.isProcessing()">Confirmar y Pagar</span>
+        </button>
       </div>
     </div>
   `
 })
 export class CartComponent {
   cartService = inject(CartService);
+  metodo = 'recoger';
+  direccion = '';
+  metodoPago = 'efectivo';
+
+  cambiarMetodo(event: any) {
+    this.metodo = event.target.value;
+  }
+
+  cambiarDireccion(event: any) {
+    this.direccion = event.target.value;
+  }
+
+  cambiarPago(event: any) {
+    this.metodoPago = event.target.value;
+  }
 }

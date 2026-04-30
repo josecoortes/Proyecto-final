@@ -8,12 +8,12 @@ import { CartService } from './services/cart.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, CartComponent], 
+  imports: [CommonModule, RouterOutlet, RouterLink, CartComponent],
   template: `
     <nav class="navbar">
       <div class="navbar-container">
         <a routerLink="/" class="navbar-logo">
-          🍔 Burguer Marina
+           Burguer Marina
         </a>
         <ul class="navbar-menu">
           <li><a routerLink="/" class="nav-link">Inicio</a></li>

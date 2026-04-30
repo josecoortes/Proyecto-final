@@ -21,6 +21,8 @@ return new class extends Migration
         $table->string('metodo_entrega'); // 'domicilio' o 'recogida'
         $table->string('direccion_empresa')->nullable();
         $table->string('estado')->default('pendiente');
+        $table->string('metodo_pago')->default('efectivo'); // 'efectivo' o 'tarjeta'
+        $table->string('estado_pago')->default('pendiente'); // 'pendiente' o 'pagado'
         $table->timestamps();
     });
 }

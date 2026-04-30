@@ -21,6 +21,10 @@ import { AuthService } from '../../services/auth.service'; // Importamos el serv
         <div *ngIf="error" class="error-msg">
           {{ error }}
         </div>
+        
+        <div *ngIf="mensajeExito" class="success-msg">
+          {{ mensajeExito }}
+        </div>
 
         <form (ngSubmit)="iniciarSesion()" class="login-form">
           <div class="form-group">
@@ -36,6 +40,7 @@ import { AuthService } from '../../services/auth.service'; // Importamos el serv
           </div>
 
           <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-inline"></span>
             {{ cargando ? 'Conectando...' : 'Iniciar Sesión' }}
           </button>
         </form>
@@ -49,42 +54,40 @@ import { AuthService } from '../../services/auth.service'; // Importamos el serv
   `
 })
 export class LoginComponent {
-  // Ojo: He quitado el HttpClient de aquí. Ahora inyectamos el AuthService que he creado
-  // para que él se encargue de hablar con Laravel. El componente solo pinta la vista.
   private authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   credenciales = { email: '', password: '' };
   error = '';
+  mensajeExito = '';
   cargando = false;
 
   iniciarSesion() {
     this.cargando = true;
     this.error = '';
+    this.mensajeExito = '';
 
-    // Llamamos a la función login de NUESTRO servicio, pasándole los datos del formulario.
     this.authService.login(this.credenciales).subscribe({
       next: (respuesta) => {
-        // Tuvimos éxito. El auth.service.ts ya se ha encargado de guardar el token en el LocalStorage
         this.cargando = false;
+        this.mensajeExito = '¡Bienvenido de nuevo, ' + respuesta.user.name + '! Redirigiendo...';
         this.cdr.detectChanges();
-        alert('¡Bienvenido de nuevo, ' + respuesta.user.name + '!');
         
-        // Usamos location.href en lugar de router.navigate para forzar una recarga
-        // limpia de toda la aplicación Angular y asegurar que el Navbar pille el token.
-        window.location.href = '/'; 
+        // Retrasamos la recarga para que el usuario pueda ver el bonito mensaje y el throbber desaparezca
+        setTimeout(() => {
+          window.location.href = '/'; 
+        }, 1500);
       },
       error: (err) => {
         this.cargando = false;
         console.error('Error de login:', err);
-        // Personalizar el mensaje si el usuario/contraseña no existe
         if (err.status === 401) {
           this.error = 'Correo o contraseña incorrectos.';
         } else {
           this.error = 'No pudimos conectar con los servidores de Marina. Intenta más tarde.';
         }
-        this.cdr.detectChanges(); // Forzar actualización visual del botón y del mensaje de error
+        this.cdr.detectChanges(); 
       }
     });
   }

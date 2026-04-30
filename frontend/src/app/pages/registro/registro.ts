@@ -22,6 +22,10 @@ import { AuthService } from '../../services/auth.service';
         <div *ngIf="error" class="error-msg">
           {{ error }}
         </div>
+        
+        <div *ngIf="mensajeExito" class="success-msg">
+          {{ mensajeExito }}
+        </div>
 
         <form (ngSubmit)="registrarse()" class="login-form">
           <div class="form-group">
@@ -43,6 +47,7 @@ import { AuthService } from '../../services/auth.service';
           </div>
 
           <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-inline"></span>
             {{ cargando ? 'Creando cuenta...' : 'Registrarse' }}
           </button>
         </form>
@@ -56,41 +61,38 @@ import { AuthService } from '../../services/auth.service';
   `
 })
 export class RegistroComponent {
-  // Ojo: Igual que hicimos en el Login, he quitado el HttpClient de aquí. 
-  // Ahora usamos el AuthService para delegarle el curro de hablar con el backend.
   private authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   datos = { name: '', email: '', password: '' };
   error = '';
+  mensajeExito = '';
   cargando = false;
 
   registrarse() {
     this.cargando = true;
     this.error = '';
+    this.mensajeExito = '';
 
-    console.log('Enviando datos de registro al AuthService...', this.datos); // CHIVATO 1
-
-    // Llamamos a la función registro que acabamos de meter en el servicio
     this.authService.registro(this.datos).subscribe({
       next: (respuesta) => {
-        console.log('CHIVATO: Registro exitoso y auto-login completado', respuesta);
         this.cargando = false;
+        this.mensajeExito = '¡Bienvenido a Burguer Marina, ' + respuesta.user.name + '! Entrando...';
         this.cdr.detectChanges();
-        alert('¡Bienvenido a Burguer Marina, ' + respuesta.user.name + '!');
-        window.location.href = '/'; // Forzamos recarga limpia
+        
+        setTimeout(() => {
+          window.location.href = '/'; 
+        }, 1500);
       },
       error: (err) => {
         this.cargando = false;
-        console.error('CHIVATO 3: Fallo en el registro', err);
-        // Personalizar el mensaje si el correo ya existe (código 422 de validación de Laravel)
         if (err.status === 422) {
           this.error = 'Revisa los datos. Es posible que el correo ya esté en uso o la contraseña sea muy corta.';
         } else {
           this.error = 'Ocurrió un error en los servidores de Marina. Intenta más tarde.';
         }
-        this.cdr.detectChanges(); // Forzar actualización visual del botón y del mensaje de error
+        this.cdr.detectChanges(); 
       }
     });
   }

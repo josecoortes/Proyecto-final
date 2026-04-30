@@ -36,21 +36,28 @@ class PedidoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            // 'user_id' => 'required|exists:users,id', <- Borrado por seguridad
             'metodo_entrega' => 'nullable|string',
             'direccion_empresa' => 'nullable|string',
+            'metodo_pago' => 'nullable|string|in:efectivo,tarjeta',
             'platos' => 'required|array',
             'platos.*.id' => 'required|exists:platos,id',
             'platos.*.cantidad' => 'required|integer|min:1'
         ]);
 
+        $metodoPago = $validated['metodo_pago'] ?? 'efectivo';
+        $estadoPago = ($metodoPago === 'tarjeta') ? 'pagado' : 'pendiente';
+
         $pedido = Pedido::create([
-            'user_id' => $validated['user_id'],
+            // Magia pura: Laravel lee el JWT Token que envía Angular 17 y saca al usuario validado
+            'user_id' => auth()->id(), 
             'fecha' => now()->toDateString(),
             'hora' => now()->toTimeString(),
             'metodo_entrega' => $validated['metodo_entrega'] ?? 'recoger',
             'direccion_empresa' => $validated['direccion_empresa'] ?? null,
-            'estado' => 'pendiente'
+            'estado' => 'pendiente',
+            'metodo_pago' => $metodoPago,
+            'estado_pago' => $estadoPago
         ]);
 
         foreach ($validated['platos'] as $plato) {
