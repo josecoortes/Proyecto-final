@@ -20,8 +20,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('telefono')->nullable();
-            $table->enum('rol',['cliente', 'admin'])->default('cliente');
-            $table-> rememberToken();
+            $table->enum('rol',['cliente', 'admin', 'gestor', 'empleado', 'repartidor', 'cajero'])->default('cliente');
+            $table->rememberToken();
             $table->timestamps();
         });
 

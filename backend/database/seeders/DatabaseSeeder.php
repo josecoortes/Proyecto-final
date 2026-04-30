@@ -10,7 +10,9 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Aquí llamamos a la lista de seeders que queremos ejecutar
         $this->call([
+            AdminSeeder::class,
             PlatoSeeder::class,
+            DashboardSeeder::class,
         ]);
     }
 }

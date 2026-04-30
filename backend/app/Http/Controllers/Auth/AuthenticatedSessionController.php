@@ -25,9 +25,18 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
+        // Redirección dinámica basada en el rol
+        $rol = auth()->user()->rol;
+
+        if ($rol === 'empleado') {
+            return redirect()->intended(route('admin.platos.index', absolute: false));
+        } elseif ($rol === 'repartidor' || $rol === 'cajero') {
+            return redirect()->intended(route('admin.pedidos.index', absolute: false));
+        }
+
+        // Por defecto, admin y gestor van al Dashboard
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

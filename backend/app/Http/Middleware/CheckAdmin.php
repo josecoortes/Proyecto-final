@@ -13,17 +13,19 @@ class CheckAdmin
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        // Verificamos si el usuario está autenticado y tiene rol de administrador
-        // Nota para memoria: He tenido que crear este middleware porque si no 
-        // cualquiera que se registre en la web y pusiera /login en la url de laravel 
-        // podría entrar al dashboard.
-        if (auth()->check() && auth()->user()->rol === 'admin') {
+        // Si no pasamos roles por parámetro, asumimos que solo 'admin' puede entrar
+        if (empty($roles)) {
+            $roles = ['admin'];
+        }
+
+        // Verificamos si el usuario está autenticado y su rol está dentro de los roles permitidos
+        if (auth()->check() && in_array(auth()->user()->rol, $roles)) {
             return $next($request);
         }
 
         // Si pillamos a alguien intentando entrar sin permiso, 403
-        abort(403, 'Acceso Denegado. Esta zona es exclusiva para administradores de Marina Burguer.');
+        abort(403, 'Acceso Denegado. No tienes permisos para acceder a esta sección.');
     }
 }
