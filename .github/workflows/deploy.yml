@@ -13,7 +13,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    # --- PASO 1: COMPILAR EN GITHUB (Para no saturar la EC2) ---
+    # --- PASO 1: COMPILAR EN GITHUB ---
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
@@ -25,17 +25,22 @@ jobs:
         npm install
         npm run build
 
-    # --- PASO 2: ENVIAR ARCHIVOS A AWS (Sin node_modules, que pesan mucho) ---
-    - name: Copy files via SSH
+    # --- PASO 2: EMPAQUETAR TODO (Método Ultra Rápido) ---
+    - name: Create Deployment Package
+      run: |
+        tar -czf deployment.tar.gz backend/ frontend/dist/ nginx/ docker-compose.yml Dockerfile --exclude='backend/vendor' --exclude='frontend/node_modules' --exclude='.git'
+
+    # --- PASO 3: ENVIAR EL PAQUETE ---
+    - name: Copy Package via SSH
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "backend/**,frontend/dist/**,nginx/**,docker-compose.yml,Dockerfile"
+        source: "deployment.tar.gz"
         target: "~/Proyecto-final"
 
-    # --- PASO 3: ARRANCAR CONTENEDORES EN AWS ---
+    # --- PASO 4: DESCOMPRIMIR Y ARRANCAR EN AWS ---
     - name: Execute Docker Compose
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -45,6 +50,9 @@ jobs:
         script: |
           cd ~/Proyecto-final
           
+          # Extraemos los archivos
+          tar -xzf deployment.tar.gz
+          
           # 1. Ajustamos la URL de la aplicación
           sed -i 's|APP_URL=http://localhost|APP_URL=http://54.160.77.44|g' backend/.env
 
@@ -53,7 +61,7 @@ jobs:
           sudo systemctl stop apache2 || true
           sudo fuser -k 80/tcp || true
 
-          # 3. Desplegamos con Docker Compose (ya tenemos la carpeta dist compilada)
+          # 3. Desplegamos con Docker Compose
           docker-compose down
           docker-compose up -d --build
 
