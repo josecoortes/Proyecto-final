@@ -38,3 +38,6 @@ jobs:
           # 3. Desplegamos con Docker Compose
           docker-compose down
           docker-compose up -d --build
+          # 4. Aseguramos que la base de datos tenga los datos (admin, platos, etc.)
+          sleep 15
+          docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
