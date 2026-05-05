@@ -30,6 +30,15 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
+          # 0. Creamos memoria SWAP (RAM virtual) para que el servidor no se congele al compilar Angular
+          if [ ! -f /swapfile ]; then
+            sudo fallocate -l 2G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+            echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+          fi
+
           # Ajustamos la URL de la aplicación para que las redirecciones al blade funcionen
           sed -i 's|APP_URL=http://localhost|APP_URL=http://54.160.77.44|g' backend/.env
           docker-compose run --rm workspace sh -c "cd frontend && npm install && npm run build"
