@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        // Redirección dinámica basada en el rol
+        // Redirección dinámica basada en el rol (Forzamos la ruta, sin usar intended para evitar el error de 403)
         $rol = auth()->user()->rol;
 
         if ($rol === 'empleado') {

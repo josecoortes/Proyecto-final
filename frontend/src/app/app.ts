@@ -10,7 +10,7 @@ import { environment } from '../environments/environment';
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, CartComponent],
-  template: './app.html',
+  templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
 export class App implements OnInit {

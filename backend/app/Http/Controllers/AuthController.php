@@ -24,7 +24,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']), // ¡Importante! Encriptar contraseña
+            'password' => $validated['password'], // El modelo User lo cifra automáticamente con su cast 'hashed'
             'rol' => 'cliente', // Por defecto todos son clientes
         ]);
 

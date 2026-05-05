@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
             ['email' => 'admin@marinaburguer.com'],
             [
                 'name' => 'El Jefazo (Admin)',
-                'password' => Hash::make('secreta123'),
+                'password' => 'secreta123',
                 'rol' => 'admin',
             ]
         );

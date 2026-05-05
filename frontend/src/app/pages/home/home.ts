@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule],
   styleUrls: ['./home.css'],
-  template: './home.html'
+  templateUrl: './home.html'
 })
 export class HomeComponent implements OnInit {
   private http = inject(HttpClient);

@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [CommonModule, FormsModule],
   // Trucazo: Reutilizamos el CSS del login para no repetir el código (la tarjeta es igual)
   styleUrls: ['../login/login.css'],
-  template: './registro.html'
+  templateUrl: './registro.html'
 })
 export class RegistroComponent {
   private authService = inject(AuthService);

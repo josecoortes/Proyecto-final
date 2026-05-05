@@ -84,7 +84,7 @@ import { CartService } from '../../services/cart.service';
         <div class="delivery-options mt-3">
           <label for="metodoPago">Método de Pago:</label>
           <select id="metodoPago" class="delivery-select" (change)="cambiarPago($event)">
-            <option value="efectivo">Efectivo al recibir</option>
+            <option value="efectivo">{{ metodo === 'domicilio' ? 'Efectivo al recibir' : 'Pagar en caja (Efectivo)' }}</option>
             <option value="tarjeta">💳 Tarjeta Bancaria (Seguro)</option>
           </select>
         </div>
@@ -104,7 +104,7 @@ import { CartService } from '../../services/cart.service';
           } @else if (cartService.isProcessing() && !cartService.isSimulatingPayment()) {
             <span>Procesando...</span>
           } @else {
-            <span>{{ metodo === 'recoger' && metodoPago !== 'tarjeta' ? 'Confirmar' : 'Confirmar y Pagar' }}</span>
+            <span>{{ metodoPago === 'tarjeta' ? 'Confirmar y Pagar' : 'Confirmar Pedido' }}</span>
           }
         </button>
       </div>

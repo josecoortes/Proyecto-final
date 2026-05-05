@@ -37,7 +37,9 @@
     </nav>
 
     <!-- Componente del Carrito Lateral -->
-    <app-cart></app-cart>
+    @if (router.url === '/') {
+      <app-cart></app-cart>
+    }
 
     <main class="main-content">
       <router-outlet></router-outlet>
