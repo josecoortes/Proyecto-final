@@ -30,14 +30,20 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
-          #con esto paramos  lo que haya en el puerto 80
+          # Ajustamos la URL de la aplicación para que las redirecciones al blade funcionen
+          sed -i 's|APP_URL=http://localhost|APP_URL=http://54.160.77.44|g' backend/.env
+
+          # Detener posibles servicios en el host que usen el puerto 80
           sudo systemctl stop nginx || true
           sudo systemctl stop apache2 || true
-          # 2. lo finalizamos
+
+          # lo finalizamos
           sudo fuser -k 80/tcp || true
-          # 3. Desplegamos con Docker Compose
+
+          # Desplegamos con Docker Compose
           docker-compose down
           docker-compose up -d --build
-          # 4. Aseguramos que la base de datos tenga los datos (admin, platos, etc.)
+
+          # Aseguramos que la base de datos tenga los datos (admin, platos, etc.)
           sleep 15
           docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
