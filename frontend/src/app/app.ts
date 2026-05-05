@@ -18,6 +18,7 @@ import { environment } from '../environments/environment';
         </a>
         <ul class="navbar-menu">
           <li><a routerLink="/" class="nav-link">Inicio</a></li>
+          <li><a routerLink="/contacto" class="nav-link">Contacto</a></li>
           
           <!-- Botones cuando NO estamos conectados -->
           @if (!isLoggedIn) {

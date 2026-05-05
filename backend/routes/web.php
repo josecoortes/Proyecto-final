@@ -80,3 +80,20 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+//Redirige cualquier ruta no encontrada a un lugar seguro según el rol
+Route::fallback(function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        if ($user->rol === 'admin' || $user->rol === 'gestor') {
+            return redirect()->route('dashboard');
+        } elseif ($user->rol === 'repartidor' || $user->rol === 'cajero') {
+            return redirect()->route('admin.pedidos.index');
+        } elseif ($user->rol === 'empleado') {
+            return redirect()->route('admin.platos.index');
+        }
+    }
+    
+    // Si no está logueado o es un cliente, lo mandamos al inicio (Angular)
+    return redirect('/');
+});
