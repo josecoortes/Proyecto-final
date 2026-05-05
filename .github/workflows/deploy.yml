@@ -28,7 +28,7 @@ jobs:
     # --- PASO 2: EMPAQUETAR TODO (Método Ultra Rápido) ---
     - name: Create Deployment Package
       run: |
-        tar -czf deployment.tar.gz backend/ frontend/dist/ nginx/ docker-compose.yml Dockerfile --exclude='backend/vendor' --exclude='frontend/node_modules' --exclude='.git'
+        tar --exclude='backend/vendor' --exclude='frontend/node_modules' --exclude='.git' -czf deployment.tar.gz backend/ frontend/dist/ nginx/ docker-compose.yml Dockerfile
 
     # --- PASO 3: ENVIAR EL PAQUETE ---
     - name: Copy Package via SSH
