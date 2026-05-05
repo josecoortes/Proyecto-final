@@ -25,14 +25,14 @@ jobs:
         npm install
         npm run build
 
-    # --- PASO 2: ENVIAR ARCHIVOS A AWS ---
+    # --- PASO 2: ENVIAR ARCHIVOS A AWS (Sin node_modules, que pesan mucho) ---
     - name: Copy files via SSH
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "."
+        source: "backend/**,frontend/dist/**,nginx/**,docker-compose.yml,Dockerfile"
         target: "~/Proyecto-final"
 
     # --- PASO 3: ARRANCAR CONTENEDORES EN AWS ---
