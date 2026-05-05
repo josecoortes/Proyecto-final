@@ -32,6 +32,7 @@ jobs:
           cd ~/Proyecto-final
           # Ajustamos la URL de la aplicación para que las redirecciones al blade funcionen
           sed -i 's|APP_URL=http://localhost|APP_URL=http://54.160.77.44|g' backend/.env
+          docker-compose run --rm workspace sh -c "cd frontend && npm install && npm run build"
 
           # Detener posibles servicios en el host que usen el puerto 80
           sudo systemctl stop nginx || true
