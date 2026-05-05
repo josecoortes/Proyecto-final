@@ -30,5 +30,11 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
+          #con esto paramos  lo que haya en el puerto 80
+          sudo systemctl stop nginx || true
+          sudo systemctl stop apache2 || true
+          # 2. lo finalizamos
+          sudo fuser -k 80/tcp || true
+          # 3. Desplegamos con Docker Compose
           docker-compose down
           docker-compose up -d --build
