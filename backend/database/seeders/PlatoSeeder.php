@@ -9,13 +9,14 @@ class PlatoSeeder extends Seeder
 {
     public function run(): void
     {
+        $baseUrl = config('app.url') . ':8000'; // En local usamos el puerto 8000, en prod se suele configurar APP_URL ya con el puerto si es necesario.
+
         // Plato 1: Hamburguesa
         Plato::create([
             'nombre' => 'Hamburguesa Clásica',
             'descripcion' => 'Carne 100% vacuno con lechuga y queso cheddar.',
             'precio' => 12.50,
-            // Foto de Wikimedia Commons (Fiable)
-            'imagen' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Hamburger_%28black_bg%29.jpg/640px-Hamburger_%28black_bg%29.jpg' 
+            'imagen' => $baseUrl . '/storage/platos/hamburguesa.png' 
         ]);
 
         // Plato 2: Pizza
@@ -23,7 +24,7 @@ class PlatoSeeder extends Seeder
             'nombre' => 'Pizza Margarita',
             'descripcion' => 'Tomate, mozzarella y albahaca fresca.',
             'precio' => 10.00,
-            'imagen' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/640px-Eq_it-na_pizza-margherita_sep2005_sml.jpg'
+            'imagen' => $baseUrl . '/storage/platos/pizza.png'
         ]);
         
         // Plato 3: Sushi
@@ -31,7 +32,7 @@ class PlatoSeeder extends Seeder
             'nombre' => 'Sushi Mix',
             'descripcion' => 'Bandeja de 12 piezas variadas.',
             'precio' => 18.90,
-            'imagen' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Sushi_platter.jpg/640px-Sushi_platter.jpg'
+            'imagen' => $baseUrl . '/storage/platos/sushi.png'
         ]);
     }
 }
