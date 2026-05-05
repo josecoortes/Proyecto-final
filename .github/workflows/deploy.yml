@@ -13,6 +13,19 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
+    # --- PASO 1: COMPILAR EN GITHUB (Para no saturar la EC2) ---
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    # --- PASO 2: ENVIAR ARCHIVOS A AWS ---
     - name: Copy files via SSH
       uses: appleboy/scp-action@v0.1.4
       with:
@@ -22,6 +35,7 @@ jobs:
         source: "."
         target: "~/Proyecto-final"
 
+    # --- PASO 3: ARRANCAR CONTENEDORES EN AWS ---
     - name: Execute Docker Compose
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -30,30 +44,19 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
-          # 0. Creamos memoria SWAP (RAM virtual) para que el servidor no se congele al compilar Angular
-          if [ ! -f /swapfile ]; then
-            sudo fallocate -l 2G /swapfile
-            sudo chmod 600 /swapfile
-            sudo mkswap /swapfile
-            sudo swapon /swapfile
-            echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-          fi
-
-          # Ajustamos la URL de la aplicación para que las redirecciones al blade funcionen
+          
+          # 1. Ajustamos la URL de la aplicación
           sed -i 's|APP_URL=http://localhost|APP_URL=http://54.160.77.44|g' backend/.env
-          docker-compose run --rm workspace sh -c "cd frontend && npm install && npm run build"
 
-          # Detener posibles servicios en el host que usen el puerto 80
+          # 2. Limpieza de puertos en el host
           sudo systemctl stop nginx || true
           sudo systemctl stop apache2 || true
-
-          # lo finalizamos
           sudo fuser -k 80/tcp || true
 
-          # Desplegamos con Docker Compose
+          # 3. Desplegamos con Docker Compose (ya tenemos la carpeta dist compilada)
           docker-compose down
           docker-compose up -d --build
 
-          # Aseguramos que la base de datos tenga los datos (admin, platos, etc.)
+          # 4. Aseguramos que la base de datos tenga los datos
           sleep 15
           docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
