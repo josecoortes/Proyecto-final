@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
@@ -55,11 +56,21 @@ class AuthController extends Controller
         // 3. Le damos una llave (token) nueva
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        $response = [
             'message' => '¡Hola de nuevo ' . $user->name . '!',
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user
-        ]);
+        ];
+
+        // 4. Si el usuario es empleado/admin, generamos un Magic Link
+        $rolesStaff = ['admin', 'gestor', 'empleado', 'repartidor', 'cajero'];
+        if (in_array($user->rol, $rolesStaff)) {
+            $response['magic_url'] = URL::temporarySignedRoute(
+                'admin.magic_login', now()->addMinutes(5), ['user' => $user->id]
+            );
+        }
+
+        return response()->json($response);
     }
 }

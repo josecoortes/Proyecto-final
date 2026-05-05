@@ -14,9 +14,10 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.login');
+        // Redirigir al usuario al login del frontend
+        return redirect()->to(config('app.frontend_url', 'http://localhost:4200') . '/login');
     }
 
     /**
@@ -31,13 +32,13 @@ class AuthenticatedSessionController extends Controller
         $rol = auth()->user()->rol;
 
         if ($rol === 'empleado') {
-            return redirect()->intended(route('admin.platos.index', absolute: false));
+            return redirect(route('admin.platos.index', absolute: false));
         } elseif ($rol === 'repartidor' || $rol === 'cajero') {
-            return redirect()->intended(route('admin.pedidos.index', absolute: false));
+            return redirect(route('admin.pedidos.index', absolute: false));
         }
 
         // Por defecto, admin y gestor van al Dashboard
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect(route('dashboard', absolute: false));
     }
 
     /**

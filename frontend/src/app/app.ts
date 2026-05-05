@@ -4,6 +4,7 @@ import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { CartComponent } from './components/cart/cart';
 import { CartService } from './services/cart.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -19,26 +20,30 @@ import { CartService } from './services/cart.service';
           <li><a routerLink="/" class="nav-link">Inicio</a></li>
           
           <!-- Botones cuando NO estamos conectados -->
-          <ng-container *ngIf="!isLoggedIn">
+          @if (!isLoggedIn) {
             <li><a routerLink="/login" class="nav-link">Iniciar Sesión</a></li>
             <li><a routerLink="/registro" class="btn-primary btn-sm">Regístrate</a></li>
-          </ng-container>
+          }
 
           <!-- Botones cuando SÍ estamos conectados -->
-          <ng-container *ngIf="isLoggedIn">
-            <li><span class="user-greeting">👤 Hola, {{ userName }}</span></li>
+          @if (isLoggedIn) {
+            <li><span class="user-greeting"> Hola, {{ userName }}</span></li>
             <li><button (click)="cerrarSesion()" class="btn-outline-danger btn-sm">Cerrar Sesión</button></li>
-          </ng-container>
+          }
 
-          <!-- Botón de Carrito (siempre visible o al menos disponible para ver) -->
-          <li>
-            <button class="cart-trigger-btn" (click)="cartService.openCart()">
-              🛒
-              <span class="cart-badge" *ngIf="cartService.totalItems() > 0">
-                {{ cartService.totalItems() }}
-              </span>
-            </button>
-          </li>
+          <!-- Botón de Carrito (solo visible en el menú principal) -->
+          @if (router.url === '/') {
+            <li>
+              <button class="cart-trigger-btn" (click)="cartService.openCart()">
+                🛒
+                @if (cartService.totalItems() > 0) {
+                  <span class="cart-badge">
+                    {{ cartService.totalItems() }}
+                  </span>
+                }
+              </button>
+            </li>
+          }
         </ul>
       </div>
     </nav>
@@ -62,7 +67,7 @@ import { CartService } from './services/cart.service';
 export class App implements OnInit {
   public authService = inject(AuthService);
   public cartService = inject(CartService);
-  private router = inject(Router);
+  public router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
 

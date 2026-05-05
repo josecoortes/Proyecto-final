@@ -23,13 +23,36 @@ class AdminPedidoController extends Controller
             // El cajero SOLO ve pedidos para recoger en local
             $query->where('metodo_entrega', 'recoger');
         }
+        
+        // No mostrar pedidos que ya están completados (pagados y entregados)
+        $query->whereNot(function ($q) {
+            $q->where('estado', 'entregado')
+              ->where('estado_pago', 'pagado');
+        });
         // Si es 'admin', ve todo, no ponemos where.
 
-        $pedidos = $query->orderBy('fecha', 'desc')
-                        ->orderBy('hora', 'desc')
-                        ->get();
+        $pedidos = $query->orderBy('id', 'desc')->get();
 
-        return view('admin.pedidos.index', compact('pedidos', 'userRol'));
+        // Calcular ingresos de hoy para mostrar en el panel
+        $pedidosPagadosHoy = Pedido::with('platos')
+            ->whereDate('fecha', now()->toDateString())
+            ->where('estado_pago', 'pagado');
+            
+        // Si el usuario es cajero o repartidor, solo vemos los ingresos de su tipo de pedidos
+        if ($userRol === 'repartidor') {
+            $pedidosPagadosHoy->where('metodo_entrega', 'domicilio');
+        } elseif ($userRol === 'cajero') {
+            $pedidosPagadosHoy->where('metodo_entrega', 'recoger');
+        }
+        
+        $pedidosPagadosHoy = $pedidosPagadosHoy->get();
+
+        $ingresosHoy = $pedidosPagadosHoy->sum(function($pedido) {
+            return $pedido->platos->sum(fn($plato) => $plato->precio * $plato->pivot->cantidad);
+        });
+        $completadosHoy = $pedidosPagadosHoy->count();
+
+        return view('admin.pedidos.index', compact('pedidos', 'userRol', 'ingresosHoy', 'completadosHoy'));
     }
 
     /**
@@ -42,6 +65,11 @@ class AdminPedidoController extends Controller
         ]);
 
         $pedido = Pedido::findOrFail($id);
+
+        if ($request->estado === 'entregado' && $pedido->estado_pago !== 'pagado') {
+            return redirect()->back()->with('error', 'No puedes marcar el pedido como entregado sin haber registrado el pago.');
+        }
+
         $pedido->estado = $request->estado;
         $pedido->save();
 
