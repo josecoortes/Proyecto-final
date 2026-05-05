@@ -13,31 +13,15 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    # --- PASO 1: COMPILAR EN GITHUB ---
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - name: Copy files via SSH
+      uses: appleboy/scp-action@v0.1.4
       with:
-        node-version: '20'
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "."
+        target: "~/Proyecto-final"
 
-    - name: Build Frontend
-      run: |
-        cd frontend
-        npm install
-        npm run build
-
-    # --- PASO 2: EMPAQUETAR TODO (Ultra ligero) ---
-    - name: Create Deployment Package
-      run: |
-        tar --exclude='backend/vendor' --exclude='frontend/node_modules' --exclude='.angular' --exclude='.git' --exclude='backend/storage/*.log' -czf deployment.tar.gz backend/ frontend/dist/ nginx/ docker-compose.yml Dockerfile
-
-    # --- PASO 3: ENVIAR EL PAQUETE (Método Directo) ---
-    - name: Copy Package via SCP
-      run: |
-        echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
-        chmod 600 private_key.pem
-        scp -i private_key.pem -o StrictHostKeyChecking=no deployment.tar.gz ubuntu@${{ secrets.EC2_HOST }}:~/Proyecto-final/deployment.tar.gz
-
-    # --- PASO 4: DESCOMPRIMIR Y ARRANCAR EN AWS ---
     - name: Execute Docker Compose
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -46,22 +30,10 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
-          
-          # Extraemos los archivos
-          tar -xzf deployment.tar.gz
-          
-          # 1. Ajustamos la URL de la aplicación
-          sed -i 's|APP_URL=http://localhost|APP_URL=http://54.160.77.44|g' backend/.env
-
-          # 2. Limpieza de puertos en el host
-          sudo systemctl stop nginx || true
-          sudo systemctl stop apache2 || true
-          sudo fuser -k 80/tcp || true
-
-          # 3. Desplegamos con Docker Compose
+          # Paramos y arrancamos
           docker-compose down
           docker-compose up -d --build
-
-          # 4. Aseguramos que la base de datos tenga los datos
+          
+          # Aseguramos el admin
           sleep 15
           docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
