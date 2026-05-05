@@ -19,7 +19,8 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "."
+        # Versión de emergencia: ignoramos las carpetas pesadas para que no se cuelgue
+        source: ".,!frontend/node_modules,!backend/vendor,!.git,!.angular"
         target: "~/Proyecto-final"
 
     - name: Execute Docker Compose
