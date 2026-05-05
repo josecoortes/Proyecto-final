@@ -25,10 +25,10 @@ jobs:
         npm install
         npm run build
 
-    # --- PASO 2: EMPAQUETAR TODO ---
+    # --- PASO 2: EMPAQUETAR TODO (Ultra ligero) ---
     - name: Create Deployment Package
       run: |
-        tar --exclude='backend/vendor' --exclude='frontend/node_modules' --exclude='.git' -czf deployment.tar.gz backend/ frontend/dist/ nginx/ docker-compose.yml Dockerfile
+        tar --exclude='backend/vendor' --exclude='frontend/node_modules' --exclude='.angular' --exclude='.git' --exclude='backend/storage/*.log' -czf deployment.tar.gz backend/ frontend/dist/ nginx/ docker-compose.yml Dockerfile
 
     # --- PASO 3: ENVIAR EL PAQUETE (Método Directo) ---
     - name: Copy Package via SCP
