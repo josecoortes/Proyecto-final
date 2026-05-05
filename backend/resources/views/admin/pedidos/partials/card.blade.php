@@ -68,13 +68,16 @@
             <div class="flex space-x-2">
                 <select name="estado" class="flex-grow rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-sm focus:ring-blue-500 focus:border-blue-500">
                     
-                    <option value="preparando" {{ $pedido->estado === 'preparando' ? 'selected' : '' }} @if($userRol === 'repartidor' && $pedido->estado !== 'preparando') disabled hidden @endif>🍳 Preparando (Cocina)</option>
+                    {{-- Solo el admin puede ver/volver a poner el estado pendiente --}}
+                    <option value="pendiente" {{ $pedido->estado === 'pendiente' ? 'selected' : '' }} @if($userRol !== 'admin' && $pedido->estado !== 'pendiente') disabled hidden @endif>⏳ Pendiente (Nuevo)</option>
+
+                    <option value="preparando" {{ $pedido->estado === 'preparando' ? 'selected' : '' }} @if($userRol !== 'admin' && $userRol !== 'cajero' && $pedido->estado !== 'preparando') disabled hidden @endif>🍳 Preparando (Cocina)</option>
                     
                     <option value="en_reparto" {{ $pedido->estado === 'en_reparto' ? 'selected' : '' }}>🛵 En Reparto</option>
                     
                     <option value="entregado" {{ $pedido->estado === 'entregado' ? 'selected' : '' }}>✅ Entregado</option>
                     
-                    <option value="cancelado" {{ $pedido->estado === 'cancelado' ? 'selected' : '' }} @if($userRol === 'repartidor' && $pedido->estado !== 'cancelado') disabled hidden @endif>❌ Cancelado</option>
+                    <option value="cancelado" {{ $pedido->estado === 'cancelado' ? 'selected' : '' }} @if($userRol !== 'admin' && $pedido->estado !== 'cancelado') disabled hidden @endif>❌ Cancelado</option>
                 </select>
                 <button type="submit" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-bold shadow transition">
                     Actualizar
