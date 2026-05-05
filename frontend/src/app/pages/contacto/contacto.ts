@@ -12,7 +12,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
         <div class="contacto-info">
           <h1>Contáctanos</h1>
           <p class="subtitle">Estamos aquí para escucharte. Pásate por nuestro local o llámanos.</p>
-          
+
           <div class="info-grid">
             <div class="info-item">
               <span class="icon">📞</span>
@@ -21,7 +21,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
                 <p>+34 951 123 45678</p> <!-- Número falso con un dígito de más -->
               </div>
             </div>
-            
+
             <div class="info-item">
               <span class="icon">📍</span>
               <div>
@@ -29,7 +29,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
                 <p>Barriada Los Asperones, Málaga, España</p>
               </div>
             </div>
-            
+
             <div class="info-item">
               <span class="icon">⏰</span>
               <div>
@@ -41,13 +41,13 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
         </div>
 
         <div class="map-container">
-          <iframe 
-            [src]="mapUrl" 
-            width="100%" 
-            height="450" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy" 
+          <iframe
+            [src]="mapUrl"
+            width="100%"
+            height="450"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
             referrerpolicy="no-referrer-when-downgrade">
           </iframe>
         </div>
@@ -121,14 +121,13 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
     }
   `]
 })
+
+// Mapa de google con la ubicacion
 export class ContactoComponent {
   mapUrl: SafeResourceUrl;
 
   constructor(private sanitizer: DomSanitizer) {
-    // Coordenadas: 36.72072692962662, -4.5012847471740836 (Los Asperones)
     const url = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3198.5!2d-4.50128!3d36.7207!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDQzJzE0LjYiTiA0wrAzMCcwNC42Ilc!5e0!3m2!1ses!2ses!4v1714920000000!5m2!1ses!2ses';
-    // Nota: El 'pb' de Google Maps es complejo. Usaré un formato más directo si es posible o simplemente las coordenadas.
-    // Para simplificar y que funcione seguro, usaremos q=lat,long
     const embedUrl = `https://maps.google.com/maps?q=36.7207269,-4.5012847&z=15&output=embed`;
     this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
   }

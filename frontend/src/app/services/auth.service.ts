@@ -13,7 +13,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
 
-  // Inicializamos el estado siempre en FALSE para que el servidor (SSR) y 
+  // Inicializamos el estado siempre en FALSE para que el servidor (SSR) y
   // la primera carga del cliente generen exactamente el mismo HTML (y no se rompa la Hidratación de Angular).
   private loggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.loggedInSubject.asObservable(); // Observable público
@@ -31,7 +31,7 @@ export class AuthService {
   }
 
   // Comprueba si ya hay un token guardado (al refrescar la página)
-  // Ojo: Angular intenta renderizar la página en el servidor (SSR) antes de mandarla al navegador.
+  // Angular intenta renderizar la página en el servidor (SSR) antes de mandarla al navegador.
   // En el servidor, "localStorage" no existe, por eso tenemos que comprobar si typeof window !== 'undefined'.
   private hasToken(): boolean {
     if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
@@ -55,10 +55,9 @@ export class AuthService {
     );
   }
 
-  // Realizar la petición de Registro (¡NUEVO!)
+  // Realizar la petición de Registro
   // Igual que en el login, le pasamos los datos y si Laravel dice OK, guardamos el token
-  // para que no tenga que iniciar sesión a mano justo después de registrarse. 
-  // (¡Es un auto-login!)
+  // para que no tenga que iniciar sesión a mano justo después de registrarse.
   registro(datos: { name: string; email: string; password: string }) {
     return this.http.post<any>(`${this.apiUrl}/register`, datos).pipe(
       tap(respuesta => {
