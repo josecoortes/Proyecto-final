@@ -9,12 +9,14 @@ class PlatoSeeder extends Seeder
 {
     public function run(): void
     {
+        $baseUrl = config('app.url') . ':8000'; // En local usamos el puerto 8000, en prod se suele configurar APP_URL ya con el puerto si es necesario.
+
         // Plato 1: Hamburguesa
         Plato::create([
             'nombre' => 'Hamburguesa Clásica',
             'descripcion' => 'Carne 100% vacuno con lechuga y queso cheddar.',
             'precio' => 12.50,
-            'imagen' => 'http://localhost:8000/storage/platos/hamburguesa.png' 
+            'imagen' => $baseUrl . '/storage/platos/hamburguesa.png' 
         ]);
 
         // Plato 2: Pizza
@@ -22,7 +24,7 @@ class PlatoSeeder extends Seeder
             'nombre' => 'Pizza Margarita',
             'descripcion' => 'Tomate, mozzarella y albahaca fresca.',
             'precio' => 10.00,
-            'imagen' => 'http://localhost:8000/storage/platos/pizza.png'
+            'imagen' => $baseUrl . '/storage/platos/pizza.png'
         ]);
         
         // Plato 3: Sushi
@@ -30,7 +32,7 @@ class PlatoSeeder extends Seeder
             'nombre' => 'Sushi Mix',
             'descripcion' => 'Bandeja de 12 piezas variadas.',
             'precio' => 18.90,
-            'imagen' => 'http://localhost:8000/storage/platos/sushi.png'
+            'imagen' => $baseUrl . '/storage/platos/sushi.png'
         ]);
     }
 }
