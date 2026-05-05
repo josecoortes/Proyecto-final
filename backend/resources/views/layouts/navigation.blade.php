@@ -35,6 +35,10 @@
                         {{ __('Empleados') }}
                     </x-nav-link>
                     @endif
+
+                    <x-nav-link :href="env('FRONTEND_URL', 'http://localhost:4200')" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold">
+                        {{ __('Ver Tienda 🛒') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -117,6 +121,10 @@
                 {{ __('Empleados') }}
             </x-responsive-nav-link>
             @endif
+
+            <x-responsive-nav-link :href="env('FRONTEND_URL', 'http://localhost:4200')" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold">
+                {{ __('Ver Tienda 🛒') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

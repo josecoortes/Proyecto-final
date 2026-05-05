@@ -7,6 +7,24 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Ruta mágica para auto-login desde Angular
+Route::get('/magic-login/{user}', function (\Illuminate\Http\Request $request, \App\Models\User $user) {
+    if (! $request->hasValidSignature()) {
+        abort(401, 'El enlace mágico ha caducado o no es válido.');
+    }
+
+    \Illuminate\Support\Facades\Auth::login($user);
+    $rol = $user->rol;
+
+    if ($rol === 'empleado') {
+        return redirect(route('admin.platos.index'));
+    } elseif ($rol === 'repartidor' || $rol === 'cajero') {
+        return redirect(route('admin.pedidos.index'));
+    }
+
+    return redirect(route('dashboard'));
+})->name('admin.magic_login')->middleware('web');
+
 // Panel de Administración Base (Cualquier usuario logueado en web puede entrar, luego el middleware los expulsa)
 Route::middleware(['auth'])->group(function () {
     

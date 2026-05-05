@@ -18,13 +18,17 @@ import { AuthService } from '../../services/auth.service'; // Importamos el serv
           <p>La comida que amas, a un clic de distancia.</p>
         </div>
 
-        <div *ngIf="error" class="error-msg">
-          {{ error }}
-        </div>
+        @if (error) {
+          <div class="error-msg">
+            {{ error }}
+          </div>
+        }
         
-        <div *ngIf="mensajeExito" class="success-msg">
-          {{ mensajeExito }}
-        </div>
+        @if (mensajeExito) {
+          <div class="success-msg">
+            {{ mensajeExito }}
+          </div>
+        }
 
         <form (ngSubmit)="iniciarSesion()" class="login-form">
           <div class="form-group">
@@ -40,7 +44,9 @@ import { AuthService } from '../../services/auth.service'; // Importamos el serv
           </div>
 
           <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando">
-            <span *ngIf="cargando" class="spinner-inline"></span>
+            @if (cargando) {
+              <span class="spinner-inline"></span>
+            }
             {{ cargando ? 'Conectando...' : 'Iniciar Sesión' }}
           </button>
         </form>
@@ -76,7 +82,11 @@ export class LoginComponent {
         
         // Retrasamos la recarga para que el usuario pueda ver el bonito mensaje y el throbber desaparezca
         setTimeout(() => {
-          window.location.href = '/'; 
+          if (respuesta.magic_url) {
+            window.location.href = respuesta.magic_url;
+          } else {
+            window.location.href = '/'; 
+          }
         }, 1500);
       },
       error: (err) => {
