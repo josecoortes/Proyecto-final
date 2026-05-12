@@ -4,7 +4,7 @@ services:
     container_name: angular_ssr
     volumes:
       - .:/var/www/html
-    command: sh -c "cd frontend && PORT=4200 npm run serve:ssr:frontend"
+    command: sh -c "cd frontend && npm install && PORT=4200 npm run serve:ssr:frontend"
     restart: always
 
   nginx:
