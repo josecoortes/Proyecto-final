@@ -6,7 +6,7 @@ services:
       - .:/var/www/html
     ports:
       - "8000:8000"
-    command: sh -c "cd backend && composer install && php artisan serve --host=0.0.0.0 --port=8000"
+    command: sh -c "cd backend && composer install && npm install && npm run build && php artisan serve --host=0.0.0.0 --port=8000"
     restart: always
     depends_on:
       - db
