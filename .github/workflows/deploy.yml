@@ -29,6 +29,22 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
+          
+          cat << 'EOF' > backend/.env
+          APP_NAME=Laravel
+          APP_ENV=production
+          APP_KEY=base64:mI+0g9Y4DznAxRNUg0DqaI9SabqOb72GQ7OaLCQoPOM=
+          APP_DEBUG=false
+          APP_URL=http://localhost
+
+          DB_CONNECTION=mysql
+          DB_HOST=db
+          DB_PORT=3306
+          DB_DATABASE=proyecto_db
+          DB_USERNAME=root
+          DB_PASSWORD=root
+          EOF
+
           docker compose -f docker-compose.back.yml down
           docker compose -f docker-compose.back.yml up -d --build
           
