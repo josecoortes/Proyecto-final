@@ -1,0 +1,10 @@
+# Ignorar el directorio con los binarios de los proveedores (es lo que pesa 800MB)
+.terraform/
+.terraform.lock.hcl
+
+# Archivos de estado de Terraform (Recomendado no subir, pero si quieres subirlos, comenta estas líneas)
+# terraform.tfstate
+# terraform.tfstate.backup
+
+# Archivos de logs
+*.log

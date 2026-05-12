@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy to EC2 (Front & Back Separados)
 
 on:
   push:
@@ -6,35 +6,57 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Copy files via SSH
+    - name: Copy files via SSH (Backend)
       uses: appleboy/scp-action@v0.1.4
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ secrets.EC2_BACKEND_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        # Versión de emergencia: ignoramos las carpetas pesadas para que no se cuelgue
         source: ".,!frontend/node_modules,!backend/vendor,!.git,!.angular"
         target: "~/Proyecto-final"
 
-    - name: Execute Docker Compose
+    - name: Execute Docker Compose (Backend)
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ secrets.EC2_BACKEND_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/Proyecto-final
-          # Paramos y arrancamos
-          docker-compose down
-          docker-compose up -d --build
+          docker-compose -f docker-compose.back.yml down
+          docker-compose -f docker-compose.back.yml up -d --build
           
-          # Aseguramos el admin
           sleep 15
           docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Copy files via SSH (Frontend)
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_FRONTEND_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: ".,!frontend/node_modules,!backend/vendor,!.git,!.angular"
+        target: "~/Proyecto-final"
+
+    - name: Execute Docker Compose (Frontend)
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_FRONTEND_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ~/Proyecto-final
+          docker-compose -f docker-compose.front.yml down
+          docker-compose -f docker-compose.front.yml up -d --build
