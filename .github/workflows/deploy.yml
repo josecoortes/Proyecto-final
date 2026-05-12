@@ -35,7 +35,7 @@ jobs:
           APP_ENV=production
           APP_KEY=base64:mI+0g9Y4DznAxRNUg0DqaI9SabqOb72GQ7OaLCQoPOM=
           APP_DEBUG=false
-          APP_URL=http://localhost
+          APP_URL=http://${{ secrets.EC2_FRONTEND_HOST }}
 
           DB_CONNECTION=mysql
           DB_HOST=db
