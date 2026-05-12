@@ -48,7 +48,7 @@ jobs:
           docker compose -f docker-compose.back.yml down
           docker compose -f docker-compose.back.yml up -d --build
           
-          sleep 15
+          sleep 40
           docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
 
   deploy-frontend:
