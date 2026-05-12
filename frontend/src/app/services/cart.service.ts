@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 export interface Plato {
   id: number;
@@ -182,7 +183,7 @@ export class CartService {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.post('http://127.0.0.1:8000/api/pedidos', payload, { headers })
+    this.http.post(`${environment.apiUrl}/pedidos`, payload, { headers })
       .subscribe({
         next: (res: any) => {
           if (payload.metodo_pago === 'tarjeta') {
