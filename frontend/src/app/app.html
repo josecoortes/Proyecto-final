@@ -34,6 +34,43 @@
         </li>
       }
     </ul>
+
+    <!-- Botón hamburguesa solo en móvil -->
+    <button class="hamburger-btn" (click)="toggleMenu()" [class.open]="menuOpen" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <!-- Menú desplegable móvil -->
+  <div class="mobile-menu" [class.open]="menuOpen" (click)="menuOpen = false">
+    <ul class="mobile-nav-list">
+      <li><a routerLink="/" class="mobile-nav-link">🏠 Inicio</a></li>
+      <li><a routerLink="/contacto" class="mobile-nav-link">📞 Contacto</a></li>
+
+      @if (!authService.isLoggedIn()) {
+        <li><a routerLink="/login" class="mobile-nav-link">🔑 Iniciar Sesión</a></li>
+        <li><a routerLink="/registro" class="mobile-nav-link mobile-nav-primary">⭐ Regístrate</a></li>
+      }
+
+      @if (authService.isLoggedIn()) {
+        <li><a routerLink="/mis-pedidos" class="mobile-nav-link">📦 Mis Pedidos</a></li>
+        <li><span class="mobile-nav-greeting">👋 Hola, {{ authService.userName() }}</span></li>
+        <li><button (click)="cerrarSesion()" class="mobile-nav-danger">🚪 Cerrar Sesión</button></li>
+      }
+
+      @if (router.url === '/') {
+        <li>
+          <button class="mobile-nav-cart" (click)="cartService.openCart()">
+            🛒 Ver Carrito
+            @if (cartService.totalItems() > 0) {
+              <span class="mobile-cart-badge">{{ cartService.totalItems() }}</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
   </div>
 </nav>
 
