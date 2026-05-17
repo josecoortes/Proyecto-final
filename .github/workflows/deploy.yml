@@ -45,8 +45,8 @@ jobs:
           DB_USERNAME=root
           DB_PASSWORD=root
 
-          SESSION_DRIVER=database
-          SESSION_DOMAIN=burguermarina.duckdns.org
+          SESSION_DRIVER=file
+          SESSION_LIFETIME=120
           SESSION_SECURE_COOKIE=true
           EOF
 
