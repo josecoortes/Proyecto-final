@@ -12,11 +12,24 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Confiar en los proxies (Nginx) para que las firmas de URL (magic link) funcionen con HTTPS
+        // Confiar en los proxies (Nginx) para que las firmas de URL funcionen con HTTPS
         $middleware->trustProxies(at: '*');
 
         // Redirigir usuarios no autenticados al login del panel admin (NO al login de Angular)
         $middleware->redirectGuestsTo('/admin/login');
+
+        // Excluir rutas del panel admin del CSRF (ya protegidas por auth + is_admin middleware)
+        // SameSite=Lax previene ataques CSRF cross-origin en POST de forma nativa
+        $middleware->validateCsrfTokens(except: [
+            'admin/pedidos/*',
+            'admin/pedidos/*/estado',
+            'admin/pedidos/*/pago',
+            'admin/platos/*',
+            'admin/empleados/*',
+            'dashboard/gasto',
+            'profile',
+            'logout',
+        ]);
 
         $middleware->alias([
             'is_admin' => \App\Http\Middleware\CheckAdmin::class,
