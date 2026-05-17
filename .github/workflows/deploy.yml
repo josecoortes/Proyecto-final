@@ -61,6 +61,8 @@ jobs:
           docker exec entorno_trabajo php backend/artisan cache:clear
           # Solo ejecutar migraciones pendientes
           docker exec entorno_trabajo php backend/artisan migrate --force
+          # Asegurar que el usuario admin siempre existe (updateOrCreate: seguro y sin duplicados)
+          docker exec entorno_trabajo php backend/artisan db:seed --class=AdminSeeder --force
 
   deploy-frontend:
     runs-on: ubuntu-latest
