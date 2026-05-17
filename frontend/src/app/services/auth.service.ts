@@ -42,7 +42,9 @@ export class AuthService {
 
   // Realizar la petición de Login
   login(credenciales: { email: string; password: string }) {
-    return this.http.post<any>(`${this.apiUrl}/login`, credenciales).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, credenciales, {
+      headers: { 'Accept': 'application/json' }
+    }).pipe(
       tap(respuesta => {
         // Al recibir la respuesta, guardamos los datos
         if (typeof window !== 'undefined') {
@@ -56,10 +58,10 @@ export class AuthService {
   }
 
   // Realizar la petición de Registro
-  // Igual que en el login, le pasamos los datos y si Laravel dice OK, guardamos el token
-  // para que no tenga que iniciar sesión a mano justo después de registrarse.
   registro(datos: { name: string; email: string; password: string }) {
-    return this.http.post<any>(`${this.apiUrl}/register`, datos).pipe(
+    return this.http.post<any>(`${this.apiUrl}/register`, datos, {
+      headers: { 'Accept': 'application/json' }
+    }).pipe(
       tap(respuesta => {
         if (typeof window !== 'undefined') {
           localStorage.setItem('token_auth', respuesta.access_token);
