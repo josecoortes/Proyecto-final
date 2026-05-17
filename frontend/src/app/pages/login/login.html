@@ -6,15 +6,15 @@
           <p>La comida que amas, a un clic de distancia.</p>
         </div>
 
-        @if (error) {
+        @if (error()) {
           <div class="error-msg">
-            {{ error }}
+            {{ error() }}
           </div>
         }
 
-        @if (mensajeExito) {
+        @if (mensajeExito()) {
           <div class="success-msg">
-            {{ mensajeExito }}
+            {{ mensajeExito() }}
           </div>
         }
 
@@ -31,11 +31,11 @@
                    placeholder="••••••••" class="form-control" required>
           </div>
 
-          <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando">
-            @if (cargando) {
+          <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando()">
+            @if (cargando()) {
               <span class="spinner-inline"></span>
             }
-            {{ cargando ? 'Conectando...' : 'Iniciar Sesión' }}
+            {{ cargando() ? 'Conectando...' : 'Iniciar Sesión' }}
           </button>
         </form>
 

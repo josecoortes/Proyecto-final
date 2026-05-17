@@ -19,15 +19,13 @@ class AdminPedidoController extends Controller
         if ($userRol === 'repartidor') {
             // El repartidor SOLO ve pedidos a domicilio
             $query->where('metodo_entrega', 'domicilio');
-        } elseif ($userRol === 'cajero') {
-            // El cajero SOLO ve pedidos para recoger en local
-            $query->where('metodo_entrega', 'recoger');
         }
+        // El cajero y el admin ven todos los pedidos (domicilio y recogida)
         
-        // No mostrar pedidos que ya están completados (pagados y entregados)
-        $query->whereNot(function ($q) {
-            $q->where('estado', 'entregado')
-              ->where('estado_pago', 'pagado');
+        // Mostrar todos los pedidos del día o activos
+        $query->where(function($q) {
+            $q->whereIn('estado', ['pendiente', 'preparando', 'listo', 'en_reparto'])
+              ->orWhereDate('fecha', now()->toDateString());
         });
         // Si es 'admin', ve todo, no ponemos where.
 
@@ -38,11 +36,9 @@ class AdminPedidoController extends Controller
             ->whereDate('fecha', now()->toDateString())
             ->where('estado_pago', 'pagado');
             
-        // Si el usuario es cajero o repartidor, solo vemos los ingresos de su tipo de pedidos
+        // Si el usuario es repartidor, solo vemos los ingresos de su tipo de pedidos
         if ($userRol === 'repartidor') {
             $pedidosPagadosHoy->where('metodo_entrega', 'domicilio');
-        } elseif ($userRol === 'cajero') {
-            $pedidosPagadosHoy->where('metodo_entrega', 'recoger');
         }
         
         $pedidosPagadosHoy = $pedidosPagadosHoy->get();
@@ -61,7 +57,7 @@ class AdminPedidoController extends Controller
     public function updateEstado(Request $request, $id)
     {
         $request->validate([
-            'estado' => 'required|in:pendiente,preparando,en_reparto,entregado,cancelado'
+            'estado' => 'required|in:pendiente,preparando,listo,en_reparto,entregado,cancelado'
         ]);
 
         $pedido = Pedido::findOrFail($id);

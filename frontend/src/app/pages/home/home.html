@@ -14,22 +14,22 @@
           <p>Calidad en cada bocado.</p>
         </div>
 
-        @if (cargando) {
+        @if (cargando()) {
           <div class="loading-state">
             <div class="spinner"></div>
             <p>Preparando la parrilla...</p>
           </div>
         }
 
-        @if (error) {
+        @if (error()) {
           <div class="error-msg">
-            {{ error }}
+            {{ error() }}
           </div>
         }
 
-        @if (!cargando && platos.length > 0) {
+        @if (!cargando() && platos().length > 0) {
           <div class="products-grid">
-            @for (plato of platos; track plato.id) {
+            @for (plato of platos(); track plato.id) {
               <div class="product-card">
                 <div class="product-img-wrapper">
                   <img [src]="plato.imagen || 'https://via.placeholder.com/400x250/FFC72C/27251F?text=Burguer+Marina'"
@@ -50,7 +50,7 @@
           </div>
         }
 
-        @if (!cargando && platos.length === 0 && !error) {
+        @if (!cargando() && platos().length === 0 && !error()) {
           <div class="empty-state">
             No hay platos disponibles en este momento. Volvemos enseguida.
           </div>

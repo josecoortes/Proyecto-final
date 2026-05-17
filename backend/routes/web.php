@@ -62,7 +62,7 @@ Route::post('/admin/login', function (Request $request) {
 })->middleware(['throttle:10,1']);
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect(env('FRONTEND_URL', 'http://localhost:4200'));
 });
 
 // Ruta mágica para auto-login desde Angular
@@ -153,5 +153,5 @@ Route::fallback(function () {
     }
     
     // Si no está logueado o es un cliente, lo mandamos al inicio (Angular)
-    return redirect('/');
+    return redirect(env('FRONTEND_URL', 'http://localhost:4200'));
 });

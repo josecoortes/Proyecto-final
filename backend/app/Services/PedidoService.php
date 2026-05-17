@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Pedido;
+use App\Models\Plato;
 use Illuminate\Support\Facades\Log;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class PedidoService
 {
@@ -12,7 +15,11 @@ class PedidoService
      */
     public function obtenerPedidos()
     {
-        return Pedido::with(['user', 'platos'])->get()->map(function ($pedido) {
+        return Pedido::with(['user', 'platos'])
+            ->where('user_id', auth()->id()) // Solo devolvemos los pedidos del usuario autenticado
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($pedido) {
             return [
                 'id' => $pedido->id,
                 'fecha' => $pedido->fecha,
@@ -67,5 +74,89 @@ class PedidoService
         ]);
 
         return $pedido;
+    }
+
+    /**
+     * Crea una sesión de pago en Stripe (Checkout) y devuelve la URL para redirigir al usuario.
+     */
+    public function crearSesionStripe(array $datosValidados, int $userId): array
+    {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        // 1. Calculamos el total de forma SEGURA en el backend para que el usuario no pueda falsificar precios
+        $lineItems = [];
+        foreach ($datosValidados['platos'] as $platoReq) {
+            $platoDB = Plato::find($platoReq['id']);
+            if ($platoDB) {
+                $lineItems[] = [
+                    'price_data' => [
+                        'currency' => 'eur',
+                        'product_data' => [
+                            'name' => $platoDB->nombre,
+                            'images' => $platoDB->imagen ? [$platoDB->imagen] : [],
+                        ],
+                        // Stripe espera el importe en céntimos
+                        'unit_amount' => (int) ($platoDB->precio * 100),
+                    ],
+                    'quantity' => $platoReq['cantidad'],
+                ];
+            }
+        }
+
+        // 2. Si el carrito estuviera vacío o los platos fueran inválidos, fallamos
+        if (empty($lineItems)) {
+            throw new \Exception('No hay platos válidos para pagar.');
+        }
+
+        // 3. Crear el pedido preliminar en estado "pendiente" en Base de datos
+        // Esto permite guardar qué iba a pedir antes del pago
+        $datosValidados['metodo_pago'] = 'tarjeta';
+        $pedido = $this->crearPedido($datosValidados, $userId);
+        
+        // Lo marcamos temporalmente como pendiente de pago
+        $pedido->update(['estado_pago' => 'pendiente']);
+
+        // 4. Crear la sesión en Stripe
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => $lineItems,
+            'mode' => 'payment',
+            // Usamos FRONTEND_URL para que Stripe devuelva al usuario a Angular y no a Laravel
+            'success_url' => env('FRONTEND_URL', 'http://localhost:4200') . '/pago-exito?session_id={CHECKOUT_SESSION_ID}&pedido_id=' . $pedido->id,
+            'cancel_url' => env('FRONTEND_URL', 'http://localhost:4200') . '/pago-cancelado',
+            'metadata' => [
+                'pedido_id' => $pedido->id,
+                'user_id' => $userId
+            ]
+        ]);
+
+        return [
+            'id' => $session->id,
+            'url' => $session->url
+        ];
+    }
+
+    /**
+     * Confirma que el pago ha sido exitoso comunicándose con Stripe
+     */
+    public function confirmarPago(string $sessionId, int $pedidoId)
+    {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+        
+        try {
+            $session = Session::retrieve($sessionId);
+            
+            if ($session->payment_status === 'paid') {
+                $pedido = Pedido::findOrFail($pedidoId);
+                $pedido->update(['estado_pago' => 'pagado']);
+                
+                Log::info("Pago Stripe exitoso", ['pedido_id' => $pedido->id, 'session_id' => $sessionId]);
+                return true;
+            }
+            return false;
+        } catch (\Exception $e) {
+            Log::error("Error validando sesión de Stripe", ['error' => $e->getMessage()]);
+            return false;
+        }
     }
 }

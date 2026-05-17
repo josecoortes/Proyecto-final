@@ -8,7 +8,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   imports: [CommonModule],
   template: `
     <section class="contacto-section">
-      <div class="contacto-container">
+      <div class="contacto-container glass-panel">
         <div class="contacto-info">
           <h1>Contáctanos</h1>
           <p class="subtitle">Estamos aquí para escucharte. Pásate por nuestro local o llámanos.</p>
@@ -57,33 +57,41 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styles: [`
     .contacto-section {
       padding: 80px 20px;
-      background-color: #f9f9f9;
       min-height: calc(100vh - 160px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .contacto-container {
+      width: 100%;
       max-width: 1100px;
-      margin: 0 auto;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 40px;
-      background: white;
       padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
     @media (max-width: 768px) {
       .contacto-container {
         grid-template-columns: 1fr;
+        padding: 20px;
       }
     }
+    .contacto-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
     .contacto-info h1 {
-      font-size: 2.5rem;
-      color: #27251F;
+      font-size: 3rem;
       margin-bottom: 10px;
+      background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .subtitle {
-      color: #666;
+      color: var(--color-text-muted);
       margin-bottom: 40px;
+      font-size: 1.1rem;
     }
     .info-grid {
       display: flex;
@@ -94,30 +102,53 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
       display: flex;
       align-items: center;
       gap: 20px;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    .info-item:hover {
+      transform: translateX(10px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(227, 0, 15, 0.3);
     }
     .info-item .icon {
-      font-size: 2rem;
-      background: #FFC72C;
-      width: 60px;
-      height: 60px;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      width: 50px;
+      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
+      box-shadow: var(--shadow-glow);
     }
     .info-item h3 {
       margin: 0;
-      font-size: 1.1rem;
-      color: #27251F;
+      font-size: 1.2rem;
+      color: var(--color-white);
     }
     .info-item p {
       margin: 5px 0 0;
-      color: #555;
+      color: var(--color-text-muted);
     }
     .map-container {
-      border-radius: 10px;
+      border-radius: 16px;
       overflow: hidden;
-      border: 1px solid #eee;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+    .map-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
     }
   `]
 })

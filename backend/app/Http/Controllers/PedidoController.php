@@ -45,4 +45,43 @@ class PedidoController extends Controller
             'pedido_id' => $pedido->id
         ], 201);
     }
+
+    // 3. CREAR SESIÓN STRIPE
+    public function crearSesionStripe(Request $request)
+    {
+        $validated = $request->validate([
+            'metodo_entrega' => 'nullable|string',
+            'direccion_empresa' => 'nullable|string',
+            'platos' => 'required|array',
+            'platos.*.id' => 'required|exists:platos,id',
+            'platos.*.cantidad' => 'required|integer|min:1'
+        ]);
+
+        try {
+            $session = $this->pedidoService->crearSesionStripe($validated, auth()->id());
+            
+            return response()->json([
+                'url' => $session['url']
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al crear la sesión de pago: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // 4. CONFIRMAR PAGO STRIPE
+    public function confirmarPagoStripe(Request $request)
+    {
+        $validated = $request->validate([
+            'session_id' => 'required|string',
+            'pedido_id' => 'required|integer|exists:pedidos,id'
+        ]);
+
+        $confirmado = $this->pedidoService->confirmarPago($validated['session_id'], $validated['pedido_id']);
+
+        if ($confirmado) {
+            return response()->json(['mensaje' => 'Pago confirmado con éxito.']);
+        }
+
+        return response()->json(['error' => 'No se pudo verificar el pago.'], 400);
+    }
 }

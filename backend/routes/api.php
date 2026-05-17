@@ -32,6 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Gestión de Pedidos
     Route::get('/pedidos', [PedidoController::class, 'index']);
     Route::post('/pedidos', [PedidoController::class, 'store']);
+    
+    // Pasarela de Pago Stripe
+    Route::post('/crear-sesion-pago', [PedidoController::class, 'crearSesionStripe']);
+    Route::post('/confirmar-pago', [PedidoController::class, 'confirmarPagoStripe']);
 
     // Crear Comentarios
     Route::post('/comentarios', [ComentarioController::class, 'store']);
