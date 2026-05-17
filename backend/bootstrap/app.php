@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Confiar en los proxies (Nginx) para que las firmas de URL (magic link) funcionen con HTTPS
+        $middleware->trustProxies(at: '*');
+        
         $middleware->alias([
             'is_admin' => \App\Http\Middleware\CheckAdmin::class,
         ]);
