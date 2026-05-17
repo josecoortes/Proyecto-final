@@ -70,12 +70,13 @@ class AuthController extends Controller
             'user' => $user
         ];
 
-        // 4. Si el usuario es empleado/admin, generamos un Magic Link
+        // 4. Si el usuario es staff, generamos un token de auto-login cifrado para el panel admin
         $rolesStaff = ['admin', 'gestor', 'empleado', 'repartidor', 'cajero'];
         if (in_array($user->rol, $rolesStaff)) {
-            $response['magic_url'] = URL::temporarySignedRoute(
-                'admin.magic_login', now()->addMinutes(5), ['user' => $user->id]
-            );
+            // Cifrar: "user_id|timestamp_expiry" con la APP_KEY de Laravel
+            $expiry = now()->addMinutes(5)->timestamp;
+            $payload = $user->id . '|' . $expiry;
+            $response['admin_token'] = \Illuminate\Support\Facades\Crypt::encryptString($payload);
         }
 
         return response()->json($response);

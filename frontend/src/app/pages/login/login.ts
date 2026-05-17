@@ -32,11 +32,13 @@ export class LoginComponent {
         this.mensajeExito = '¡Bienvenido de nuevo, ' + respuesta.user.name + '! Redirigiendo...';
         this.cdr.detectChanges();
 
-        // Retrasamos la recarga para que el usuario pueda ver el bonito mensaje y el throbber desaparezca
+        // Retrasamos la recarga para que el usuario pueda ver el mensaje de bienvenida
         setTimeout(() => {
-          if (respuesta.magic_url) {
-            window.location.href = respuesta.magic_url;
+          if (respuesta.admin_token) {
+            // Usuario staff: redirigir al panel admin con auto-login
+            window.location.href = '/admin/login?auto=' + encodeURIComponent(respuesta.admin_token);
           } else {
+            // Usuario cliente: ir a la tienda
             window.location.href = '/';
           }
         }, 1500);
