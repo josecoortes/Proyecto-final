@@ -194,3 +194,98 @@
   text-align: center;
   font-weight: 500;
 }
+
+/* ============================================
+   RESPONSIVE MÓVIL
+   ============================================ */
+@media (max-width: 768px) {
+  /* Hero */
+  .hero-section {
+    padding: 70px 20px;
+  }
+
+  .hero-section h1 {
+    font-size: 2.8rem;
+  }
+
+  .hero-section p {
+    font-size: 1rem;
+    margin-bottom: 28px;
+  }
+
+  /* Menú */
+  .menu-section {
+    margin: 50px auto;
+    padding: 0 16px;
+  }
+
+  .menu-header {
+    margin-bottom: 36px;
+  }
+
+  .menu-header h2 {
+    font-size: 2rem;
+  }
+
+  .menu-header p {
+    font-size: 1rem;
+  }
+
+  /* Grid: 1 columna en móvil */
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  /* Imagen de producto más pequeña */
+  .product-img-wrapper {
+    height: 200px;
+  }
+
+  .product-info {
+    padding: 20px;
+  }
+
+  .product-info h3 {
+    font-size: 1.3rem;
+  }
+
+  /* Estado de carga */
+  .loading-state {
+    padding: 40px 20px;
+  }
+
+  .empty-state {
+    padding: 40px 20px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .hero-section {
+    padding: 50px 16px;
+  }
+
+  .products-grid {
+    gap: 16px;
+  }
+
+  .product-img-wrapper {
+    height: 170px;
+    padding: 12px;
+  }
+
+  .product-info {
+    padding: 16px;
+  }
+
+  .product-price-badge {
+    font-size: 1rem;
+    padding: 6px 14px;
+  }
+}
+
