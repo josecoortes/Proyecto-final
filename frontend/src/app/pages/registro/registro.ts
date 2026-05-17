@@ -40,7 +40,20 @@ export class RegistroComponent {
       error: (err) => {
         this.cargando = false;
         if (err.status === 422) {
-          this.error = 'Revisa los datos. Es posible que el correo ya esté en uso o la contraseña sea muy corta.';
+          // Si Laravel nos devuelve los errores detallados, sacamos el primero
+          if (err.error && err.error.errors) {
+            const errores = err.error.errors;
+            if (errores.password) {
+              this.error = 'La contraseña no es segura. Debe tener 8 caracteres, una mayúscula, un número y un símbolo.';
+            } else if (errores.email) {
+              this.error = 'Este correo electrónico ya está registrado o no es válido.';
+            } else {
+              // Coger cualquier otro error de validación
+              this.error = Object.values(errores)[0] as string;
+            }
+          } else {
+            this.error = 'Revisa los datos. Asegúrate de usar una contraseña segura.';
+          }
         } else {
           this.error = 'Ocurrió un error en los servidores de Marina. Intenta más tarde.';
         }
