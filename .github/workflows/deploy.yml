@@ -56,7 +56,7 @@ jobs:
           DB_USERNAME=root
           DB_PASSWORD=root
 
-          SESSION_DRIVER=cookie
+          SESSION_DRIVER=file
           SESSION_LIFETIME=120
           SESSION_SECURE_COOKIE=true
           EOF
