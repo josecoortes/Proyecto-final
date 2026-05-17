@@ -2,6 +2,34 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+// ─── LOGIN EXCLUSIVO DEL PANEL DE ADMINISTRACIÓN ───────────────────────────
+// Página de login para el panel Blade (independiente del login de Angular)
+Route::get('/admin/login', function () {
+    if (auth()->check()) {
+        return redirect('/dashboard');
+    }
+    return view('admin.admin-login');
+})->name('admin.login.form');
+
+Route::post('/admin/login', function (Request $request) {
+    $credentials = $request->only('email', 'password');
+
+    if (\Illuminate\Support\Facades\Auth::attempt($credentials, true)) {
+        $request->session()->regenerate();
+        $user = auth()->user();
+
+        if ($user->rol === 'empleado') {
+            return redirect()->route('admin.platos.index');
+        } elseif ($user->rol === 'repartidor' || $user->rol === 'cajero') {
+            return redirect()->route('admin.pedidos.index');
+        }
+        return redirect()->route('dashboard');
+    }
+
+    return back()->withErrors(['email' => 'Credenciales incorrectas. Inténtalo de nuevo.']);
+})->middleware(['throttle:10,1']);
 
 Route::get('/', function () {
     return view('welcome');

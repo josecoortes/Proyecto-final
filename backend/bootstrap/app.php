@@ -14,7 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Confiar en los proxies (Nginx) para que las firmas de URL (magic link) funcionen con HTTPS
         $middleware->trustProxies(at: '*');
-        
+
+        // Redirigir usuarios no autenticados al login del panel admin (NO al login de Angular)
+        $middleware->redirectGuestsTo('/admin/login');
+
         $middleware->alias([
             'is_admin' => \App\Http\Middleware\CheckAdmin::class,
         ]);

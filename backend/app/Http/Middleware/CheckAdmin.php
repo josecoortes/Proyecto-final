@@ -41,7 +41,7 @@ class CheckAdmin
             return redirect(config('app.frontend_url', '/'));
         }
 
-        // Si no está autenticado en absoluto, mandamos al login
-        return redirect()->route('login');
+        // Si no está autenticado en absoluto, mandamos al login del panel admin
+        return redirect('/admin/login');
     }
 }
