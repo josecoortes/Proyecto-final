@@ -40,8 +40,22 @@ return Application::configure(basePath: dirname(__DIR__))
         // con una estructura estricta y profesional, para evitar que devuelvan HTML cuando hay un error inesperado.
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
             if ($request->is('api/*')) {
-                // Si la app está en producción y es un 500, ocultamos detalles sensibles
-                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                // Si es un error de validación, devolver sus detalles y código 422
+                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => $e->errors()
+                    ], 422);
+                }
+
+                // Extraer el código HTTP si la excepción lo tiene
+                $statusCode = 500;
+                if (method_exists($e, 'getStatusCode')) {
+                    $statusCode = $e->getStatusCode();
+                } elseif (method_exists($e, 'status')) {
+                    $statusCode = $e->status();
+                }
+                
                 $message = $e->getMessage();
                 
                 if ($statusCode === 500 && !config('app.debug')) {
