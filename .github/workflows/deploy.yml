@@ -25,7 +25,7 @@ jobs:
     - name: Copy files via SSH (Backend)
       uses: appleboy/scp-action@v0.1.4
       with:
-        host: ${{ secrets.EC2_BACKEND_HOST }}\
+        host: ${{ secrets.EC2_BACKEND_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         source: ".,!frontend/node_modules,!backend/vendor,!.git,!.angular"
