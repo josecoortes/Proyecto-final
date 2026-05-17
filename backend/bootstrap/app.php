@@ -17,5 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Estandarización de Errores: Forzar siempre una respuesta JSON en las rutas de la API,
+        // evitando que devuelvan HTML (stacktraces) cuando hay un error inesperado.
+        $exceptions->shouldRenderJsonWhen(function (\Illuminate\Http\Request $request, \Throwable $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+            return $request->expectsJson();
+        });
     })->create();
