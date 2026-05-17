@@ -36,6 +36,7 @@ jobs:
           APP_KEY=base64:mI+0g9Y4DznAxRNUg0DqaI9SabqOb72GQ7OaLCQoPOM=
           APP_DEBUG=false
           APP_URL=https://burguermarina.duckdns.org
+          FRONTEND_URL=https://burguermarina.duckdns.org
 
           DB_CONNECTION=mysql
           DB_HOST=db
@@ -49,7 +50,8 @@ jobs:
           docker compose -f docker-compose.back.yml up -d --build
           
           sleep 40
-          docker exec entorno_trabajo php backend/artisan migrate:fresh --seed --force
+          # Solo ejecutar migraciones pendientes
+          docker exec entorno_trabajo php backend/artisan migrate --force
 
   deploy-frontend:
     runs-on: ubuntu-latest

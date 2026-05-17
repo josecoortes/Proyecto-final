@@ -17,7 +17,14 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => [
+                'required',
+                'string',
+                \Illuminate\Validation\Rules\Password::min(8)
+                    ->mixedCase() // Al menos una mayúscula y una minúscula
+                    ->numbers()   // Al menos un número
+                    ->symbols()   // Al menos un carácter especial
+            ],
         ]);
 
         // 2. Creamos el usuario en la base de datos
