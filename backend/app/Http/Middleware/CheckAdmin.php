@@ -25,7 +25,23 @@ class CheckAdmin
             return $next($request);
         }
 
-        // Si pillamos a alguien intentando entrar sin permiso, 403
-        abort(403, 'Acceso Denegado. No tienes permisos para acceder a esta sección.');
+        // Si el usuario está autenticado pero no tiene el rol correcto, lo redirigimos al lugar adecuado
+        if (auth()->check()) {
+            $rol = auth()->user()->rol;
+
+            // Si es un rol de staff pero está intentando acceder a un área que no le corresponde,
+            // lo mandamos a su zona correcta en vez de mostrar un error
+            if ($rol === 'empleado') {
+                return redirect()->route('admin.platos.index');
+            } elseif ($rol === 'repartidor' || $rol === 'cajero') {
+                return redirect()->route('admin.pedidos.index');
+            }
+
+            // Si es un cliente normal o un rol desconocido, lo mandamos a la tienda
+            return redirect(config('app.frontend_url', '/'));
+        }
+
+        // Si no está autenticado en absoluto, mandamos al login
+        return redirect()->route('login');
     }
 }
