@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Burguer Marina API — Documentación</title>
+  <meta name="description" content="Documentación completa de la API REST de Burguer Marina. Endpoints de autenticación, platos, pedidos y pagos.">
+  <link rel="icon" type="image/png" href="https://em-content.zobj.net/source/apple/354/hamburger_1f354.png">
+  <!-- Swagger UI CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f1117;
+      color: #e8eaf6;
+      min-height: 100vh;
+    }
+
+    /* Header superior */
+    .api-header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 32px 40px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    }
+
+    .api-header-logo {
+      font-size: 3rem;
+    }
+
+    .api-header-text h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #e3000f, #ff6b35);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .api-header-text p {
+      color: rgba(255,255,255,0.55);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    .api-badges {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .badge-green  { color: #4ade80; border-color: #4ade80; background: rgba(74,222,128,0.1); }
+    .badge-blue   { color: #60a5fa; border-color: #60a5fa; background: rgba(96,165,250,0.1); }
+    .badge-orange { color: #fb923c; border-color: #fb923c; background: rgba(251,146,60,0.1); }
+    .badge-purple { color: #c084fc; border-color: #c084fc; background: rgba(192,132,252,0.1); }
+
+    /* Swagger UI personalizado */
+    #swagger-ui {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    /* Override de estilos de Swagger UI para tema oscuro */
+    .swagger-ui .wrapper { padding: 0; }
+    .swagger-ui .info { display: none; } /* Ocultamos el info default, usamos nuestro header */
+
+    .swagger-ui .topbar { display: none; }
+
+    .swagger-ui .opblock-tag {
+      background: #1e1e2e !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      border-radius: 10px !important;
+      margin-bottom: 8px !important;
+    }
+
+    .swagger-ui .opblock-tag:hover {
+      background: #252535 !important;
+    }
+
+    .swagger-ui .opblock-tag span {
+      color: #e8eaf6 !important;
+      font-size: 1rem !important;
+      font-weight: 700 !important;
+    }
+
+    .swagger-ui .opblock {
+      border-radius: 8px !important;
+      border: 1px solid rgba(255,255,255,0.06) !important;
+      margin-bottom: 8px !important;
+    }
+
+    .swagger-ui, .swagger-ui .info .title {
+      color: #e8eaf6;
+    }
+
+    .swagger-ui .scheme-container {
+      background: #1e1e2e !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      border-radius: 10px !important;
+      padding: 16px !important;
+      box-shadow: none !important;
+    }
+
+    .swagger-ui .btn.authorize {
+      background: #e3000f !important;
+      border-color: #e3000f !important;
+      color: white !important;
+      border-radius: 6px !important;
+      font-weight: 700 !important;
+    }
+
+    .swagger-ui .btn.authorize:hover {
+      background: #ff1a2a !important;
+    }
+
+    .swagger-ui .opblock .opblock-summary-description {
+      color: rgba(232,234,246,0.7) !important;
+    }
+
+    /* Footer */
+    .api-footer {
+      text-align: center;
+      padding: 24px;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header personalizado -->
+  <div class="api-header">
+    <div class="api-header-logo">🍔</div>
+    <div class="api-header-text">
+      <h1>Burguer Marina API</h1>
+      <p>Documentación interactiva de la API REST — Proyecto Intermodular 2º DAW 2025/2026</p>
+      <div class="api-badges">
+        <span class="badge badge-green">v1.0.0</span>
+        <span class="badge badge-blue">Laravel 12</span>
+        <span class="badge badge-blue">Laravel Sanctum</span>
+        <span class="badge badge-orange">OpenAPI 3.0</span>
+        <span class="badge badge-purple">AWS Production</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swagger UI -->
+  <div id="swagger-ui"></div>
+
+  <div class="api-footer">
+    Burguer Marina · Nicolás Jiménez & Jose Cortés · 2026 · 
+    <a href="https://github.com/josecoortes/Proyecto-final" style="color: #60a5fa; text-decoration: none;">GitHub</a>
+  </div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function () {
+      SwaggerUIBundle({
+        url: "/api-docs/openapi.yaml",
+        dom_id: "#swagger-ui",
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        tryItOutEnabled: true,
+        supportedSubmitMethods: ["get", "post", "put", "patch", "delete"],
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 2,
+        docExpansion: "list",
+        filter: true,
+        showExtensions: true,
+        showCommonExtensions: true
+      });
+    };
+  </script>
+</body>
+</html>
