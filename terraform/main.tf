@@ -89,6 +89,11 @@ resource "aws_instance" "front_burguermarina" {
     aws_security_group.front_group_burguermarina.id,
   ]
 
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "Front-burguerMarina"
   }

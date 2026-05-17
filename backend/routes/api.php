@@ -9,8 +9,12 @@ use App\Http\Controllers\ComentarioController;
 
 
 // RUTAS PÚBLICAS (Sin token)
-Route::post('/register', [AuthController::class, 'register']); //
-Route::post('/login', [AuthController::class, 'login']);       //
+
+// Seguridad: Rate Limiting (Máximo 10 peticiones por minuto) para evitar ataques de fuerza bruta
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 Route::get('/platos', [PlatoController::class, 'index']);      // Ver la carta
 Route::get('/platos/{id}', [PlatoController::class, 'show']);  // Ver un plato
