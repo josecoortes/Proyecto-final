@@ -52,7 +52,11 @@ export class RegistroComponent {
             this.error.set('Revisa los datos. Asegúrate de usar una contraseña segura.');
           }
         } else {
-          this.error.set('Ocurrió un error en los servidores de Marina. Intenta más tarde.');
+          if (err.error && err.error.error) {
+            this.error.set('Error Técnico (Pásale esto al profe): ' + err.error.error);
+          } else {
+            this.error.set('Ocurrió un error en los servidores de Marina. Intenta más tarde.');
+          }
         }
       }
     });

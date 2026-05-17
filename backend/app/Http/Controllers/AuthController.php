@@ -27,24 +27,33 @@ class AuthController extends Controller
             ],
         ]);
 
-        // 2. Creamos el usuario en la base de datos
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'], // El modelo User lo cifra automáticamente con su cast 'hashed'
-            'rol' => 'cliente', // Por defecto todos son clientes
-        ]);
+        try {
+            // 2. Creamos el usuario en la base de datos
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'], // El modelo User lo cifra automáticamente con su cast 'hashed'
+                'rol' => 'cliente', // Por defecto todos son clientes
+            ]);
 
-        // 3. Creamos un token de acceso (es como su llave digital)
-        $token = $user->createToken('auth_token')->plainTextToken;
+            // 3. Creamos un token de acceso (es como su llave digital)
+            $token = $user->createToken('auth_token')->plainTextToken;
 
-        // 4. Devolvemos la respuesta al Frontend
-        return response()->json([
-            'message' => '¡Usuario registrado con éxito!',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ], 201);
+            // 4. Devolvemos la respuesta al Frontend
+            return response()->json([
+                'message' => '¡Usuario registrado con éxito!',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user' => $user
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error interno en el servidor.',
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ], 500);
+        }
     }
 
     // --- LOGIN DE USUARIO ---
