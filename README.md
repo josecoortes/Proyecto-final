@@ -1,33 +1,42 @@
 # 🍔 Burguer Marina
 
-Burguer Marina es una plataforma web integral desarrollada como proyecto intermodular para **2º DAW**. Su objetivo es digitalizar completamente un restaurante de comida rápida, ofreciendo una experiencia de compra atractiva para los clientes y un panel de gestión logística y financiera avanzado para los empleados.
+Burguer Marina es una plataforma web integral desarrollada como **proyecto intermodular para 2º DAW**. Su objetivo es digitalizar completamente un restaurante de comida rápida, ofreciendo una experiencia de compra atractiva para los clientes y un panel de gestión logística y financiera avanzado para el equipo de trabajo.
 
-El proyecto está desarrollado con una **arquitectura de microservicios en dos instancias AWS separadas**, utilizando **Laravel 11 (PHP)** en el backend como API REST, **MySQL** como base de datos, y una **interfaz dinámica construida en Angular 21** para los clientes, junto con un panel administrativo renderizado con **Blade**. Todo ello orquestado bajo contenedores **Docker** y aprovisionado automáticamente con **Terraform**.
-
----
-
-## ✅ Funcionalidades implementadas
-
-- 🔐 Autenticación robusta con **Laravel Sanctum (JWT)** y contraseñas cifradas (Bcrypt).
-- 👥 **Sistema de roles jerárquicos y estancos**: Cliente, Empleado (Cocinero), Repartidor, Cajero, Gestor y Administrador.
-- 🛒 **Carrito de la compra reactivo** (Angular Signals) con persistencia local y cálculo dinámico de precios.
-- 💳 **Simulación de pasarela de pago** con opciones de entrega a domicilio o recogida en local.
-- 📦 **Panel de logística inteligente**: Los repartidores solo ven pedidos a domicilio y los cajeros solo recogidas en local.
-- 💶 **Gestor de estados y cobros**: Botones de confirmación de cobro en efectivo y estados de preparación.
-- 📈 **Dashboard financiero estricto**: Contabilidad real que solo suma ingresos cuando el pedido está verificado como "Pagado".
-- 🏗️ **Proxy inverso con Nginx** para unificar el tráfico del Frontend y enrutar las peticiones `/api` al Backend de forma interna.
-- ☁️ **Arquitectura de dos instancias EC2 en AWS**: Frontend y Backend en máquinas separadas, comunicadas a través de una zona DNS privada de Route 53.
-- 🏭 **Infraestructura como Código (IaC)** con **Terraform**: aprovisionamiento automático de instancias, grupos de seguridad, IPs elásticas y DNS interno.
-- 🚀 **Integración y Despliegue Continuo (CI/CD)** con **GitHub Actions**: despliegue paralelo y automatizado en ambas instancias al hacer `push` a `main`.
-- 🌐 Acceso público a través de dominio personalizado con **DuckDNS** (`burguermarina.duckdns.org`).
+El proyecto sigue una **arquitectura cliente-servidor desacoplada**: un backend en **Laravel 12 (PHP 8.2)** que expone una API REST, y un frontend en **Angular 21** que la consume. El panel de administración está renderizado en servidor con **Blade**. Todo desplegado en **AWS EC2** con contenedores Docker y aprovisionado con **Terraform**.
 
 ---
 
 ## 🎬 Demostración en Vídeo
 
-Haz clic en la imagen a continuación para ver el funcionamiento completo de la plataforma en YouTube:
+Haz clic en la imagen para ver el funcionamiento completo en YouTube:
 
 [![Ver Video Demostrativo - Burguer Marina](https://img.youtube.com/vi/Cvq_8BQGURQ/maxresdefault.jpg)](https://youtu.be/Cvq_8BQGURQ)
+
+---
+
+## 🌐 Acceso en Producción
+
+| Recurso | URL |
+|---|---|
+| 🍔 Aplicación Web | [burguermarina.duckdns.org](https://burguermarina.duckdns.org) |
+| 📖 Documentación API (Swagger) | [burguermarina.duckdns.org/api-docs](https://burguermarina.duckdns.org/api-docs/) |
+| 🔧 Panel Administración | [burguermarina.duckdns.org/admin/login](https://burguermarina.duckdns.org/admin/login) |
+
+---
+
+## ✅ Funcionalidades implementadas
+
+- 🔐 **Autenticación robusta** con Laravel Sanctum (tokens Bearer) y contraseñas cifradas (Bcrypt) con reglas estrictas de complejidad.
+- 👥 **Sistema de 6 roles jerárquicos**: Cliente, Empleado (Cocinero), Repartidor, Cajero, Gestor y Administrador.
+- 🛒 **Carrito de la compra reactivo** (Angular Signals) con persistencia local y cálculo dinámico de precios.
+- 💳 **Pasarela de pago Stripe Checkout** integrada: pago con tarjeta o en efectivo, con confirmación segura en backend.
+- 📍 **Tracker de pedidos en tiempo real** para el cliente: barra de progreso con estados (`Recibido → Cocina → Listo → Reparto → Entregado`) adaptada al método de entrega (recogida o domicilio).
+- 📦 **KDS (Kitchen Display System)** con sistema de pestañas por estado: *Nuevos, En Cocina, Listos, En Reparto, Historial*.
+- 🚚 **Lógica de roles en logística**: cajeros gestionan todos los pedidos; repartidores solo ven pedidos a domicilio.
+- 💶 **Dashboard financiero**: contabilidad real que solo suma ingresos cuando el pedido está verificado como "Pagado".
+- 📖 **Documentación API interactiva** con Swagger UI (OpenAPI 3.0), accesible en `/api-docs`.
+- 📱 **Diseño responsive** con menú hamburguesa animado para móvil.
+- 🏗️ **Proxy inverso Nginx** para unificar tráfico y enrutar `/api` internamente.
 
 ---
 
@@ -37,134 +46,159 @@ Haz clic en la imagen a continuación para ver el funcionamiento completo de la 
 Internet
     │
     ▼
-[ burguermarina.duckdns.org ]
+[ burguermarina.duckdns.org ] (DuckDNS)
     │
     ▼
 [ EC2 Frontend (IP Elástica) ]
-  ├── Nginx (Puerto 80) ← Proxy Inverso
-  │     ├── /          → Angular 21 SSR (Puerto 4200)
-  │     └── /api, /admin, /sanctum... → Backend (DNS interno)
+  ├── Nginx (Puerto 80/443) ← Proxy Inverso + HTTPS
+  │     ├── /              → Angular 21 SSR (Puerto 4200)
+  │     ├── /api-docs      → Swagger UI (archivo estático)
+  │     └── /api, /admin   → Backend EC2 (red privada AWS)
   └── Angular 21 SSR
          │
          │ (Red privada AWS / Route 53 internal DNS)
          ▼
 [ EC2 Backend (IP Elástica) ]
-  ├── Laravel 11 API (Puerto 8000)
-  └── MySQL 8 (Puerto 3306)
+  ├── Laravel 12 API (Puerto 8000)
+  └── MySQL 8.0 (Puerto 3306)
 ```
-
----
-
-## 🚧 Próximas mejoras planificadas
-
-- Generación automática de facturas en PDF.
-- Integración real con la pasarela de pagos Stripe.
-- Control avanzado de stock de ingredientes (que oculte platos sin existencias).
-- Activar HTTPS con certificado SSL/TLS gratuito mediante **Let's Encrypt / Certbot**.
 
 ---
 
 ## 🧱 Tecnologías utilizadas
 
-### Backend & Infraestructura
-- **Laravel 11** (PHP 8.2)
-- **MySQL 8.0**
-- **Docker** y Docker Compose
-- **Nginx** (Proxy Inverso)
-- **Terraform** (IaC — Infraestructura como Código)
-- **AWS EC2**, **AWS Route 53**, **AWS Elastic IP**
-- **GitHub Actions** (CI/CD)
-- Autenticación: JWT (Laravel Sanctum)
+### Backend
+| Tecnología | Uso |
+|---|---|
+| **Laravel 12** (PHP 8.2) | Framework principal y API REST |
+| **MySQL 8.0** | Base de datos relacional |
+| **Laravel Sanctum** | Autenticación con tokens Bearer |
+| **Laravel Breeze** | Panel de administración con sesiones Blade |
+| **Stripe PHP SDK** | Pasarela de pago integrada |
+| **OpenAPI 3.0 / Swagger UI** | Documentación interactiva de la API |
 
 ### Frontend
-- **Angular 21** (TypeScript) — Web del cliente
-- **Angular SSR** (Server Side Rendering)
-- **Laravel Blade** — Panel Administrativo
-- HTML5 · CSS3 · **Tailwind CSS**
-- Signals (Manejo de estado reactivo en Angular)
-
-### Herramientas de despliegue
-- **DuckDNS** (Dominio público gratuito)
-- **Docker Compose** (Orquestación de contenedores)
-- **GitHub Actions** (Automatización CI/CD)
-
----
-
-## 🗂️ Base de datos
-
-Base de datos relacional enfocada a escalabilidad:
-
-| Tabla | Campos principales |
+| Tecnología | Uso |
 |---|---|
-| `users` | nombre, email, password, rol (admin, gestor, repartidor, cajero, empleado, cliente) |
-| `platos` | nombre, descripción, precio, imagen, categoría |
-| `pedidos` | fecha, hora, metodo_entrega, direccion, estado, metodo_pago, estado_pago |
-| `pedido_plato` | (Tabla Pivot) pedido_id, plato_id, cantidad |
+| **Angular 21** (TypeScript) | Framework principal del cliente |
+| **Angular SSR** | Server-Side Rendering para SEO y rendimiento |
+| **Angular Signals** | Gestión de estado reactivo |
+| **Blade (Laravel)** | Panel administrativo renderizado en servidor |
+| **CSS3 / Vanilla CSS** | Estilos propios sin dependencias externas |
+
+### Infraestructura y DevOps
+| Tecnología | Uso |
+|---|---|
+| **AWS EC2** | Dos instancias: Frontend y Backend |
+| **AWS Elastic IP** | IP fija pública para cada instancia |
+| **AWS Route 53** | DNS interno entre instancias |
+| **Terraform** | Infraestructura como Código (IaC) |
+| **Docker & Docker Compose** | Contenedores de desarrollo y producción |
+| **Nginx** | Servidor web y proxy inverso con HTTPS |
+| **GitHub Actions** | CI/CD: despliegue automático al hacer push a `main` |
+| **DuckDNS** | Dominio público gratuito |
 
 ---
 
-## 🔐 Autenticación y seguridad
+## 🗂️ Modelo de Base de Datos
 
-- El registro y login desde Angular devuelven un **Token JWT** guardado en el LocalStorage.
-- Todas las rutas del panel `admin/` en Blade están protegidas mediante **Middlewares personalizados** de Laravel que evalúan el rol del usuario antes de cargar la vista.
-- Un Empleado no puede forzar la URL para acceder a Finanzas, Laravel lo intercepta y bloquea (403).
-- La comunicación entre instancias se realiza a través de la **red privada interna de AWS**, sin exponer el Backend directamente a Internet.
+Base de datos relacional construida íntegramente mediante **migraciones de Laravel** (sin PHPMyAdmin ni SQL manual):
+
+| Tabla | Descripción | Campos clave |
+|---|---|---|
+| `users` | Usuarios del sistema | `name`, `email`, `password`, `rol`, `telefono` |
+| `platos` | Carta del restaurante | `nombre`, `descripcion`, `precio`, `imagen`, `categoria_id` |
+| `categorias` | Categorías de platos | `nombre` |
+| `pedidos` | Pedidos realizados | `user_id`, `estado`, `metodo_entrega`, `metodo_pago`, `estado_pago`, `fecha`, `hora` |
+| `pedido_plato` | Tabla pivot (N:M) | `pedido_id`, `plato_id`, `cantidad` |
+| `comentarios` | Reseñas del restaurante | `user_id`, `texto`, `valoracion` |
+| `gastos` | Gastos del negocio (dashboard) | `concepto`, `importe`, `fecha` |
+| `personal_access_tokens` | Tokens Sanctum | `tokenable_id`, `token`, `abilities` |
 
 ---
 
-## 🚀 Instrucciones de despliegue
+## 🔐 Seguridad
 
-### Despliegue local (desarrollo)
+- Los tokens **JWT (Sanctum)** se almacenan en `localStorage` del navegador.
+- Las rutas del panel admin están protegidas por **middlewares personalizados** (`is_admin`) que evalúan el rol antes de cargar la vista.
+- Las rutas de la API están agrupadas por nivel de acceso (`auth:sanctum`).
+- Las contraseñas exigen: **8+ caracteres, mayúsculas, minúsculas, números y símbolos**.
+- Los precios se validan en el **backend** al crear la sesión de Stripe (imposible falsificar precios desde el frontend).
+- La comunicación entre instancias es por la **red privada de AWS** (el backend no está expuesto a Internet directamente).
 
-#### Requisitos
+---
+
+## 📖 API REST — Documentación
+
+La API sigue el estándar **OpenAPI 3.0** y está documentada con **Swagger UI**:
+
+👉 **[burguermarina.duckdns.org/api-docs](https://burguermarina.duckdns.org/api-docs/)**
+
+### Endpoints principales
+
+| Método | Endpoint | Auth | Descripción |
+|---|---|---|---|
+| `POST` | `/api/register` | ❌ | Registrar nuevo usuario |
+| `POST` | `/api/login` | ❌ | Iniciar sesión → devuelve token |
+| `GET` | `/api/platos` | ❌ | Listar la carta completa |
+| `GET` | `/api/platos/{id}` | ❌ | Ver detalle de un plato |
+| `POST` | `/api/platos` | ✅ | Crear plato (Admin/Empleado) |
+| `PUT` | `/api/platos/{id}` | ✅ | Editar plato (Admin/Empleado) |
+| `DELETE` | `/api/platos/{id}` | ✅ | Eliminar plato (Admin/Empleado) |
+| `GET` | `/api/pedidos` | ✅ | Ver mis pedidos |
+| `POST` | `/api/pedidos` | ✅ | Crear pedido (efectivo) |
+| `POST` | `/api/crear-sesion-pago` | ✅ | Iniciar pago con Stripe |
+| `POST` | `/api/confirmar-pago` | ✅ | Confirmar pago exitoso |
+| `GET` | `/api/comentarios` | ❌ | Ver reseñas |
+| `POST` | `/api/comentarios` | ✅ | Publicar reseña |
+
+---
+
+## 🚀 Instrucciones de despliegue local
+
+### Requisitos
 - Docker y Docker Desktop instalados y corriendo.
 - Git.
 
 ```bash
 # 1. Clona el repositorio
 git clone https://github.com/josecoortes/Proyecto-final.git
+cd Proyecto-final
 
-# 2. Levanta los contenedores con Docker
+# 2. Levanta los contenedores
 docker compose up -d
 
-# 3. Entra al contenedor del backend e instala dependencias
+# 3. Entra al contenedor e instala dependencias
 docker exec -it entorno_trabajo bash
 cd backend && composer install
-npm install && npm run build
 
-# 4. Genera la clave de Laravel y migra la base de datos con datos de prueba
+# 4. Configura el entorno y migra la base de datos
 php artisan key:generate
 php artisan migrate:fresh --seed
 
-# 5. La aplicación estará corriendo en http://localhost (Nginx)
+# 5. La app estará en http://localhost:4200 (Angular) y http://localhost:8000 (API)
 ```
 
-### Despliegue en producción (AWS con Terraform)
-
-#### Requisitos
-- Terraform instalado.
-- Credenciales de AWS configuradas en la terminal.
-- Clave SSH de AWS (`vockey.pem`) disponible.
+## ☁️ Despliegue en producción (AWS + Terraform)
 
 ```bash
-# 1. Entra en la carpeta de Terraform
+# 1. Inicializa y aplica la infraestructura con Terraform
 cd terraform
-
-# 2. Inicializa y aplica la infraestructura
 terraform init
 terraform apply
 
-# 3. Copia las IPs públicas del output y añádelas como Secrets en GitHub:
+# 2. Añade las IPs del output como Secrets en GitHub:
 #    EC2_FRONTEND_HOST → IP del Frontend
 #    EC2_BACKEND_HOST  → IP del Backend
 #    EC2_SSH_KEY       → Contenido de tu clave .pem
 
-# 4. Haz un git push a main y GitHub Actions desplegará automáticamente
+# 3. Cualquier push a main dispara el despliegue automático
 git push origin main
 ```
 
 ---
 
 ## 👨‍💻 Autores
-**Nicolás Jiménez & Jose Cortés**  
+
+**Nicolás Jiménez & Jose Cortés**
 2º DAW — Proyecto Intermodular · 2025/2026
