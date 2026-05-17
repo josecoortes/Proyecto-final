@@ -12,14 +12,25 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Copy files via SSH (Backend)
-      uses: appleboy/scp-action@v0.1.4
+    - name: Limpiar archivos con permisos root antes de copiar (Backend)
+      uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_BACKEND_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          sudo rm -rf ~/Proyecto-final/backend/public/build || true
+          sudo chown -R ubuntu:ubuntu ~/Proyecto-final || true
+
+    - name: Copy files via SSH (Backend)
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_BACKEND_HOST }}\
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
         source: ".,!frontend/node_modules,!backend/vendor,!.git,!.angular"
         target: "~/Proyecto-final"
+        overwrite: true
 
     - name: Execute Docker Compose (Backend)
       uses: appleboy/ssh-action@v1.0.0
