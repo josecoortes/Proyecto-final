@@ -21,9 +21,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
       console.error(errorMsg);
       // Aquí se podría integrar un ToastService en un futuro para mostrar el error visualmente
-      // alert("Oh no, algo salió mal con la conexión. Intenta de nuevo.");
       
-      return throwError(() => new Error(errorMsg));
+      // DEBEMOS devolver el error original para que los componentes puedan leer err.status y err.error
+      return throwError(() => error);
     })
   );
 };
