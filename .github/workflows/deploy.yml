@@ -54,6 +54,11 @@ jobs:
           docker compose -f docker-compose.back.yml up -d --build
           
           sleep 40
+          # Asegurar permisos de escritura en storage (necesario para sesiones en file driver)
+          docker exec entorno_trabajo chmod -R 777 /var/www/html/backend/storage
+          # Limpiar y reconstruir la caché de configuración con el nuevo .env
+          docker exec entorno_trabajo php backend/artisan config:clear
+          docker exec entorno_trabajo php backend/artisan cache:clear
           # Solo ejecutar migraciones pendientes
           docker exec entorno_trabajo php backend/artisan migrate --force
 
