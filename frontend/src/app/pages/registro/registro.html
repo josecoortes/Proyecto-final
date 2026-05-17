@@ -6,13 +6,17 @@
           <p>Crea tu cuenta y empieza a pedir tus favoritas.</p>
         </div>
 
-        <div *ngIf="error" class="error-msg">
-          {{ error }}
-        </div>
+        @if (error) {
+          <div class="error-msg">
+            {{ error }}
+          </div>
+        }
 
-        <div *ngIf="mensajeExito" class="success-msg">
-          {{ mensajeExito }}
-        </div>
+        @if (mensajeExito) {
+          <div class="success-msg">
+            {{ mensajeExito }}
+          </div>
+        }
 
         <form (ngSubmit)="registrarse()" class="login-form">
           <div class="form-group">
@@ -34,7 +38,9 @@
           </div>
 
           <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando">
-            <span *ngIf="cargando" class="spinner-inline"></span>
+            @if (cargando) {
+              <span class="spinner-inline"></span>
+            }
             {{ cargando ? 'Creando cuenta...' : 'Registrarse' }}
           </button>
         </form>
