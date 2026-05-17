@@ -37,11 +37,25 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Estandarización de Errores: Forzar siempre una respuesta JSON en las rutas de la API,
-        // evitando que devuelvan HTML (stacktraces) cuando hay un error inesperado.
-        $exceptions->shouldRenderJsonWhen(function (\Illuminate\Http\Request $request, \Throwable $e) {
+        // con una estructura estricta y profesional, para evitar que devuelvan HTML cuando hay un error inesperado.
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
             if ($request->is('api/*')) {
-                return true;
+                // Si la app está en producción y es un 500, ocultamos detalles sensibles
+                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                $message = $e->getMessage();
+                
+                if ($statusCode === 500 && !config('app.debug')) {
+                    $message = 'Error interno del servidor. Por favor, inténtelo de nuevo más tarde.';
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'error' => [
+                        'code' => $statusCode,
+                        'message' => $message,
+                        'type' => class_basename($e)
+                    ]
+                ], $statusCode);
             }
-            return $request->expectsJson();
         });
     })->create();

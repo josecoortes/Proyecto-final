@@ -71,11 +71,15 @@
                     {{-- Solo el admin puede ver/volver a poner el estado pendiente --}}
                     <option value="pendiente" {{ $pedido->estado === 'pendiente' ? 'selected' : '' }} @if($userRol !== 'admin' && $pedido->estado !== 'pendiente') disabled hidden @endif>⏳ Pendiente (Nuevo)</option>
 
-                    <option value="preparando" {{ $pedido->estado === 'preparando' ? 'selected' : '' }} @if($userRol !== 'admin' && $userRol !== 'cajero' && $pedido->estado !== 'preparando') disabled hidden @endif>🍳 Preparando (Cocina)</option>
+                    <option value="preparando" {{ $pedido->estado === 'preparando' ? 'selected' : '' }} @if($userRol === 'repartidor' && $pedido->estado !== 'preparando') disabled hidden @endif>🍳 Preparando (Cocina)</option>
                     
-                    <option value="en_reparto" {{ $pedido->estado === 'en_reparto' ? 'selected' : '' }}>🛵 En Reparto</option>
+                    <option value="listo" {{ $pedido->estado === 'listo' ? 'selected' : '' }} @if($userRol === 'repartidor' && $pedido->estado !== 'listo') disabled hidden @endif>🛍️ Listo</option>
+
+                    {{-- En reparto: Solo para domicilio, y lo marca el cajero (o admin), no el repartidor --}}
+                    <option value="en_reparto" {{ $pedido->estado === 'en_reparto' ? 'selected' : '' }} @if(($userRol === 'repartidor' || $pedido->metodo_entrega === 'recoger') && $pedido->estado !== 'en_reparto') disabled hidden @endif>🛵 En Reparto</option>
                     
-                    <option value="entregado" {{ $pedido->estado === 'entregado' ? 'selected' : '' }}>✅ Entregado</option>
+                    {{-- Entregado: El cajero lo marca si es recoger, el repartidor lo marca si es domicilio --}}
+                    <option value="entregado" {{ $pedido->estado === 'entregado' ? 'selected' : '' }} @if($userRol === 'cajero' && $pedido->metodo_entrega === 'domicilio' && $pedido->estado !== 'entregado') disabled hidden @endif>✅ Entregado</option>
                     
                     <option value="cancelado" {{ $pedido->estado === 'cancelado' ? 'selected' : '' }} @if($userRol !== 'admin' && $pedido->estado !== 'cancelado') disabled hidden @endif>❌ Cancelado</option>
                 </select>

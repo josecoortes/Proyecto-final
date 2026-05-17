@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -15,8 +15,8 @@ export class AuthService {
 
   // Inicializamos el estado siempre en FALSE para que el servidor (SSR) y
   // la primera carga del cliente generen exactamente el mismo HTML (y no se rompa la Hidratación de Angular).
-  private loggedInSubject = new BehaviorSubject<boolean>(false);
-  public isLoggedIn$ = this.loggedInSubject.asObservable(); // Observable público
+  public isLoggedIn = signal<boolean>(false);
+  public userName = signal<string>('Invitado');
 
   constructor() {
     // Una vez construido, si estamos en el navegador, comprobamos si tenemos token
@@ -24,7 +24,9 @@ export class AuthService {
     if (typeof window !== 'undefined') {
       setTimeout(() => {
         if (this.hasToken()) {
-          this.loggedInSubject.next(true);
+          this.isLoggedIn.set(true);
+          const name = localStorage.getItem('usuario_nombre');
+          if (name) this.userName.set(name);
         }
       }, 0);
     }
@@ -50,9 +52,10 @@ export class AuthService {
         if (typeof window !== 'undefined') {
           localStorage.setItem('token_auth', respuesta.access_token);
           localStorage.setItem('usuario_nombre', respuesta.user.name);
+          this.userName.set(respuesta.user.name);
         }
         // Notificamos que el estado ha cambiado a "Conectado"
-        this.loggedInSubject.next(true);
+        this.isLoggedIn.set(true);
       })
     );
   }
@@ -66,8 +69,9 @@ export class AuthService {
         if (typeof window !== 'undefined') {
           localStorage.setItem('token_auth', respuesta.access_token);
           localStorage.setItem('usuario_nombre', respuesta.user.name);
+          this.userName.set(respuesta.user.name);
         }
-        this.loggedInSubject.next(true);
+        this.isLoggedIn.set(true);
       })
     );
   }
@@ -78,7 +82,8 @@ export class AuthService {
       localStorage.removeItem('token_auth');
       localStorage.removeItem('usuario_nombre');
     }
-    this.loggedInSubject.next(false);
+    this.userName.set('Invitado');
+    this.isLoggedIn.set(false);
   }
 
   // Obtener nombre del usuario actual

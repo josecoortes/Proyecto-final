@@ -1,8 +1,9 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; // Importamos el servicio
+import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -14,29 +15,28 @@ import { AuthService } from '../../services/auth.service'; // Importamos el serv
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
 
   credenciales = { email: '', password: '' };
-  error = '';
-  mensajeExito = '';
-  cargando = false;
+  error = signal('');
+  mensajeExito = signal('');
+  cargando = signal(false);
 
   iniciarSesion() {
-    this.cargando = true;
-    this.error = '';
-    this.mensajeExito = '';
+    this.cargando.set(true);
+    this.error.set('');
+    this.mensajeExito.set('');
 
     this.authService.login(this.credenciales).subscribe({
       next: (respuesta) => {
-        this.cargando = false;
-        this.mensajeExito = '¡Bienvenido de nuevo, ' + respuesta.user.name + '! Redirigiendo...';
-        this.cdr.detectChanges();
+        this.cargando.set(false);
+        this.mensajeExito.set('¡Bienvenido de nuevo, ' + respuesta.user.name + '! Redirigiendo...');
 
         // Retrasamos la recarga para que el usuario pueda ver el mensaje de bienvenida
         setTimeout(() => {
           if (respuesta.admin_token) {
-            // Usuario staff: redirigir al panel admin con auto-login
-            window.location.href = '/admin/login?auto=' + encodeURIComponent(respuesta.admin_token);
+            // Usuario staff: redirigir al panel admin con auto-login en el backend
+            const baseUrl = environment.apiUrl.replace('/api', '');
+            window.location.href = baseUrl + '/admin/login?auto=' + encodeURIComponent(respuesta.admin_token);
           } else {
             // Usuario cliente: ir a la tienda
             window.location.href = '/';
@@ -44,16 +44,15 @@ export class LoginComponent {
         }, 1500);
       },
       error: (err) => {
-        this.cargando = false;
+        this.cargando.set(false);
         console.error('Error de login:', err);
         if (err.status === 401) {
-          this.error = 'Correo o contraseña incorrectos.';
+          this.error.set('Correo o contraseña incorrectos.');
         } else if (err.status === 422) {
-          this.error = 'Por favor, rellena los campos correctamente antes de continuar.';
+          this.error.set('Por favor, rellena los campos correctamente antes de continuar.');
         } else {
-          this.error = 'No pudimos conectar con los servidores de Marina. Intenta más tarde.';
+          this.error.set('No pudimos conectar con los servidores de Marina. Intenta más tarde.');
         }
-        this.cdr.detectChanges();
       }
     });
   }

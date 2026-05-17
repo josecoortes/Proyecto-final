@@ -166,13 +166,31 @@ export class CartService {
       }))
     };
 
-    // Si pagan con tarjeta, simulamos la pasarela bancaria
+    // Si pagan con tarjeta, redirigimos a Stripe
     if (metodoPago === 'tarjeta') {
-      this.isSimulatingPayment.set(true);
-      setTimeout(() => {
-        this.isSimulatingPayment.set(false);
-        this.enviarPedidoApi(payload, token);
-      }, 2500); // 2.5 segundos de "Conectando con el banco..."
+      this.isSimulatingPayment.set(true); // Esto mostrará el loader en la UI
+      
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+
+      this.http.post(`${environment.apiUrl}/crear-sesion-pago`, payload, { headers })
+        .subscribe({
+          next: (res: any) => {
+            if (res.url) {
+              // ¡Magia! Redirigimos a la pasarela de Stripe
+              // El carrito NO se vacía aquí, se vaciará en la página de éxito si todo va bien.
+              window.location.href = res.url;
+            }
+          },
+          error: (err) => {
+            console.error('Error conectando con Stripe:', err);
+            this.notification.set({ type: 'error', message: 'El banco no responde. ¿Llevas suelto para pagar en efectivo?' });
+            this.isProcessing.set(false);
+            this.isSimulatingPayment.set(false);
+            setTimeout(() => this.notification.set(null), 4000);
+          }
+        });
     } else {
       this.enviarPedidoApi(payload, token);
     }

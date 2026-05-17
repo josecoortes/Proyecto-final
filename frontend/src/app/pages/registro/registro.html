@@ -6,15 +6,15 @@
           <p>Crea tu cuenta y empieza a pedir tus favoritas.</p>
         </div>
 
-        @if (error) {
+        @if (error()) {
           <div class="error-msg">
-            {{ error }}
+            {{ error() }}
           </div>
         }
 
-        @if (mensajeExito) {
+        @if (mensajeExito()) {
           <div class="success-msg">
-            {{ mensajeExito }}
+            {{ mensajeExito() }}
           </div>
         }
 
@@ -37,11 +37,11 @@
                    placeholder="••••••••" class="form-control" required minlength="8">
           </div>
 
-          <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando">
-            @if (cargando) {
+          <button type="submit" class="btn-primary w-100 login-btn" [disabled]="cargando()">
+            @if (cargando()) {
               <span class="spinner-inline"></span>
             }
-            {{ cargando ? 'Creando cuenta...' : 'Registrarse' }}
+            {{ cargando() ? 'Creando cuenta...' : 'Registrarse' }}
           </button>
         </form>
 
