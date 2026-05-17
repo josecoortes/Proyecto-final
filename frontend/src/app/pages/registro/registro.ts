@@ -1,5 +1,4 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -7,7 +6,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   // Trucazo: Reutilizamos el CSS del login para no repetir el código (la tarjeta es igual)
   styleUrls: ['../login/login.css'],
   templateUrl: './registro.html'

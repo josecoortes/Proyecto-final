@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from '../../services/cart.service';
 import { environment } from '../../../environments/environment';
@@ -7,7 +6,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   styleUrls: ['./home.css'],
   templateUrl: './home.html'
 })
