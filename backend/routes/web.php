@@ -6,10 +6,40 @@ use Illuminate\Http\Request;
 
 // ─── LOGIN EXCLUSIVO DEL PANEL DE ADMINISTRACIÓN ───────────────────────────
 // Página de login para el panel Blade (independiente del login de Angular)
-Route::get('/admin/login', function () {
+Route::get('/admin/login', function (Request $request) {
+    // AUTO-LOGIN: Si Angular nos manda un token cifrado, lo procesamos automáticamente
+    if ($request->has('auto')) {
+        try {
+            $payload = \Illuminate\Support\Facades\Crypt::decryptString($request->auto);
+            [$userId, $expiry] = explode('|', $payload);
+
+            // Verificar que el token no ha caducado (5 minutos)
+            if (now()->timestamp > (int)$expiry) {
+                return redirect('/admin/login')->withErrors(['email' => 'El enlace de acceso ha caducado. Inicia sesión de nuevo.']);
+            }
+
+            $user = \App\Models\User::findOrFail($userId);
+            \Illuminate\Support\Facades\Auth::login($user, true);
+            $request->session()->regenerate();
+
+            if ($user->rol === 'empleado') {
+                return redirect()->route('admin.platos.index');
+            } elseif ($user->rol === 'repartidor' || $user->rol === 'cajero') {
+                return redirect()->route('admin.pedidos.index');
+            }
+            return redirect()->route('dashboard');
+
+        } catch (\Exception $e) {
+            return redirect('/admin/login')->withErrors(['email' => 'Token de acceso inválido. Por favor, inicia sesión manualmente.']);
+        }
+    }
+
+    // LOGIN MANUAL: Si ya está autenticado, redirige al panel
     if (auth()->check()) {
         return redirect('/dashboard');
     }
+
+    // Mostrar el formulario de login
     return view('admin.admin-login');
 })->name('admin.login.form');
 
