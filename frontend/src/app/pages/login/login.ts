@@ -46,6 +46,8 @@ export class LoginComponent {
         console.error('Error de login:', err);
         if (err.status === 401) {
           this.error = 'Correo o contraseña incorrectos.';
+        } else if (err.status === 422) {
+          this.error = 'Por favor, rellena los campos correctamente antes de continuar.';
         } else {
           this.error = 'No pudimos conectar con los servidores de Marina. Intenta más tarde.';
         }
